@@ -16,4 +16,4 @@
         'cart': '/cart',
         'address book': '/account/address-book?_format=json'
     };
-})(jQuery);
+})( jQuery );
