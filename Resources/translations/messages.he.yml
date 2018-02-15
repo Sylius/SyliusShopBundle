@@ -5,4 +5,5 @@ sylius:
     menu:
         shop:
             account:
-                dashboard: 'Контролна табла'
+                address_book: 'רשימת כתובות'
+                change_password: 'שנה סיסמה'
