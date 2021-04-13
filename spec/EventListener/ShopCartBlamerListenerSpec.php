@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace spec\Sylius\Bundle\ShopBundle\EventListener;
 
-use Doctrine\Persistence\ObjectManager;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Sylius\Bundle\CoreBundle\SectionResolver\SectionInterface;
