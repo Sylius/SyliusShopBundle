@@ -58,7 +58,7 @@ final class NonChannelLocaleListener
 
         $request = $event->getRequest();
         /** @psalm-suppress RedundantConditionGivenDocblockType Symfony docblock is not always true */
-        if ($request->attributes && in_array($request->attributes->get('_route'), ['_wdt', '_profiler', '_profiler_search', '_profiler_search_results'])) {
+        if ($request->attributes && ('_wdt' === $request->attributes->get('_route') || str_starts_with($request->attributes->get('_route'), '_profiler'))) {
             return;
         }
 
