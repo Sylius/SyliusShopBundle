@@ -15,6 +15,12 @@
     <services>
         <defaults public="true" />
 
+        <service id="Sylius\Bundle\ShopBundle\Twig\ErrorTemplateFinder\ErrorTemplateFinder">
+            <argument type="service" id="Sylius\Bundle\CoreBundle\SectionResolver\SectionProviderInterface" />
+            <argument type="service" id="twig" />
+            <tag name="sylius.twig.error_template_finder" />
+        </service>
+
         <service id="sylius.twig.extension.original_price_to_display" class="Sylius\Bundle\ShopBundle\Twig\OrderItemOriginalPriceToDisplayExtension" public="false">
             <tag name="twig.extension" />
         </service>
