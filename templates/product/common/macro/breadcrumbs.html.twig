@@ -1,9 +1,7 @@
 {% macro product_breadcrumbs(product, additional_items = []) %}
     {% from '@SyliusShop/shared/breadcrumbs.html.twig' import breadcrumbs as breadcrumbs %}
 
-    {% set items = [] %}
-
-    {% set items = items|merge([{
+    {% set items = items|default([])|merge([{
         path: path('sylius_shop_homepage'),
         label: 'sylius.ui.home'|trans
     }]) %}
