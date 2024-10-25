@@ -3,7 +3,7 @@
         {% for i in 1..5 %}
             <label>
                 <input type="radio" {% if loop.index == rating %}checked{% endif %} disabled>
-                {{ ux_icon('tabler:star-filled', { class: 'symfony-icon symfony-icon-xs' }) }}
+                {{ ux_icon('tabler:star-filled', { class: 'icon icon-xs' }) }}
             </label>
         {% endfor %}
     </div>
