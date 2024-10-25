@@ -13,7 +13,7 @@ sylius_twig_hooks:
 
         'sylius.shop.product_review.index.header':
             breadcrumbs:
-                component: 'sylius_shop:common.product_slug'
+                component: 'sylius_shop:product.by_slug'
                 props:
                     slug: '@=_context.slug'
                     template: '@SyliusShop/product_review/index/header/breadcrumbs.html.twig'
