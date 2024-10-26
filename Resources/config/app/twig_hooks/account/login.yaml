@@ -3,7 +3,7 @@ sylius_twig_hooks:
         'sylius_shop.account.login':
             content:
                 template: '@SyliusShop/account/login/content.html.twig'
-                priority: 0        
+                priority: 0
 
         'sylius_shop.account.login.content':
             login_container:
@@ -15,7 +15,7 @@ sylius_twig_hooks:
 
         'sylius_shop.account.login.content.login_container':
             header:
-                template: "@SyliusShop/account/login/content/login_container/header.html.twig"
+                template: '@SyliusShop/account/login/content/login_container/header.html.twig'
                 priority: 200
             form:
                 template: '@SyliusShop/account/login/content/login_container/form.html.twig'
