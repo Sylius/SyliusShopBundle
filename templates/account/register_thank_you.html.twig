@@ -3,7 +3,5 @@
 {% block title %}{{ 'sylius.ui.register_in_the_store'|trans }} | {{ parent() }}{% endblock %}
 
 {% block content %}
-    <div class="container text-center my-4">
-        {% hook 'sylius_shop.account.register_thank_you' %}
-    </div>
+    {% hook 'sylius_shop.account.register_thank_you' %}
 {% endblock %}
