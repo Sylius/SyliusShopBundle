@@ -92,6 +92,7 @@ class FormComponent
     public function clearCart(): void
     {
         $this->formValues['items'] = [];
+        $this->eventDispatcher->dispatch(new GenericEvent($this->resource), SyliusCartEvents::CART_CLEAR);
         $this->manager->remove($this->resource);
         $this->manager->flush();
 
