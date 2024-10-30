@@ -1,0 +1,10 @@
+.dropdown-menu {
+  width: max-content;
+  min-width: 13rem;
+  max-width: 20rem;
+
+  .nav-link {
+    --bs-nav-link-padding-y: 2px;
+    --bs-nav-link-padding-x: 1.5rem;
+  }
+}
