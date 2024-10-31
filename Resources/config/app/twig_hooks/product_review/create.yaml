@@ -21,7 +21,7 @@ sylius_twig_hooks:
                 component: 'sylius_shop:product.by_slug'
                 props:
                     slug: '@=_context.slug'
-                    template: '@SyliusShop/product_review/create/header/breadcrumbs.html.twig'
+                    template: '@SyliusShop/product_review/create/content/header/breadcrumbs.html.twig'
                 priority: 0
 
         'sylius.shop.product_review.create.content.sidebar':
