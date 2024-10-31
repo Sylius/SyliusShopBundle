@@ -54,7 +54,7 @@ sylius_twig_hooks:
             taxon_hamburger:
                 template: "@SyliusShop/shared/layout/base/header/content/taxon_hamburger.html.twig"
                 priority: 0
-                
+
         'sylius_shop.base.header.content.security':
             logged_in_user:
                 template: '@SyliusShop/shared/layout/base/header/content/security/logged_in_user.html.twig'
@@ -62,7 +62,7 @@ sylius_twig_hooks:
             visitor:
                 template: '@SyliusShop/shared/layout/base/header/content/security/visitor.html.twig'
                 priority: 0
-                
+
         'sylius_shop.base.header.content.security.logged_in_user':
             mobile:
                 template: '@SyliusShop/shared/layout/base/header/content/security/logged_in_user/mobile.html.twig'
@@ -70,7 +70,7 @@ sylius_twig_hooks:
             desktop:
                 template: '@SyliusShop/shared/layout/base/header/content/security/logged_in_user/desktop.html.twig'
                 priority: 0
-                
+
         'sylius_shop.base.header.content.security.logged_in_user.mobile':
             menu:
                 template: '@SyliusShop/shared/layout/base/header/content/security/logged_in_user/mobile/menu.html.twig'
@@ -94,7 +94,7 @@ sylius_twig_hooks:
             logout:
                 template: '@SyliusShop/shared/layout/base/header/content/security/logged_in_user/desktop/logout.html.twig'
                 priority: 0
-        
+
         'sylius_shop.base.header.content.security.visitor':
             mobile:
                 template: '@SyliusShop/shared/layout/base/header/content/security/visitor/mobile.html.twig'
@@ -102,7 +102,7 @@ sylius_twig_hooks:
             desktop:
                 template: '@SyliusShop/shared/layout/base/header/content/security/visitor/desktop.html.twig'
                 priority: 0
-        
+
         'sylius_shop.base.header.content.security.visitor.desktop':
             user_icon:
                 template: '@SyliusShop/shared/layout/base/header/content/security/visitor/desktop/user_icon.html.twig'
@@ -124,6 +124,24 @@ sylius_twig_hooks:
                 component: "sylius_shop:common:taxon_menu"
                 props:
                     template: '@SyliusShop/shared/layout/base/header/navbar/menu.html.twig'
+                priority: 0
+
+        'sylius_shop.base.header.navbar.menu':
+            item:
+                template: '@SyliusShop/shared/layout/base/header/navbar/menu/item.html.twig'
+                priority: 0
+
+        'sylius_shop.base.header.navbar.menu.item#dropdown':
+            toggle:
+                template: '@SyliusShop/shared/layout/base/header/navbar/menu/item/toggle.html.twig'
+                priority: 100
+            dropdown:
+                template: '@SyliusShop/shared/layout/base/header/navbar/menu/item/dropdown.html.twig'
+                priority: 0
+
+        'sylius_shop.base.header.navbar.menu.item#link':
+            link:
+                template: '@SyliusShop/shared/layout/base/header/navbar/menu/item/link.html.twig'
                 priority: 0
 
         'sylius_shop.base.header.flashes':
