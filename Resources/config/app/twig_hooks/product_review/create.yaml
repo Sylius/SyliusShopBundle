@@ -1,14 +1,19 @@
 sylius_twig_hooks:
     hooks:
         'sylius.shop.product_review.create':
+            content:
+                template: '@SyliusShop/product_review/create/content.html.twig'
+                priority: 0     
+        
+        'sylius.shop.product_review.create.content':
             sidebar:
-                template: "@SyliusShop/product_review/create/sidebar.html.twig"
+                template: '@SyliusShop/product_review/create/content/sidebar.html.twig'
                 priority: 100
             main:
-                template: "@SyliusShop/product_review/create/main.html.twig"
+                template: '@SyliusShop/product_review/create/content/main.html.twig'
                 priority: 0
                 
-        'sylius.shop.product_review.create.sidebar':
+        'sylius.shop.product_review.create.content.sidebar':
             product_card:
                 component: 'sylius_shop:product:card'
                 props:
@@ -16,31 +21,31 @@ sylius_twig_hooks:
                     template: '@SyliusShop/product/common/card.html.twig'
                 priority: 0
             
-        'sylius.shop.product_review.create.main':
+        'sylius.shop.product_review.create.content.main':
             header:
-                template: "@SyliusShop/product_review/create/main/header.html.twig"
+                template: '@SyliusShop/product_review/create/content/main/header.html.twig'
                 priority: 100
             form:
                 component: 'sylius_shop:product_review:form'
                 props:
                     resource: '@=_context.product_review'
                     form: '@=_context.form'
-                    template: '@SyliusShop/product_review/create/main/form.html.twig'
+                    template: '@SyliusShop/product_review/create/content/main/form.html.twig'
                 priority: 0
                 
-        'sylius.shop.product_review.create.main.form':
+        'sylius.shop.product_review.create.content.main.form':
             rating:
-                template: "@SyliusShop/product_review/create/main/form/rating.html.twig"
+                template: '@SyliusShop/product_review/create/content/main/form/rating.html.twig'
                 priority: 400
             title:
-                template: "@SyliusShop/product_review/create/main/form/title.html.twig"
+                template: '@SyliusShop/product_review/create/content/main/form/title.html.twig'
                 priority: 300
             comment:
-                template: "@SyliusShop/product_review/create/main/form/comment.html.twig"
+                template: '@SyliusShop/product_review/create/content/main/form/comment.html.twig'
                 priority: 200
             email:
-                template: "@SyliusShop/product_review/create/main/form/email.html.twig"
+                template: '@SyliusShop/product_review/create/content/main/form/email.html.twig'
                 priority: 100
             submit:
-                template: "@SyliusShop/product_review/create/main/form/submit.html.twig"
+                template: '@SyliusShop/product_review/create/content/main/form/submit.html.twig'
                 priority: 0
