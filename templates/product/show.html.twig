@@ -4,6 +4,6 @@
 
 {% block content %}
     <div class="container mt-4 mb-5">
-        {% hook 'sylius_shop.product.show.page' with { product, configuration } %}
+        {% hook 'sylius_shop.product.show' with { product, configuration } %}
     </div>
 {% endblock %}
