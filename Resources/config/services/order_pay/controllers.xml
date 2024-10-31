@@ -21,5 +21,9 @@
             <argument type="tagged" tag="sylius_shop.provider.order_pay.pay_response" />
             <argument type="tagged" tag="sylius_shop.provider.order_pay.after_pay_response" />
         </service>
+
+        <service id="sylius_shop.controller.payment_request_pay" parent="sylius.controller.payment_request_pay">
+            <argument type="service" id="sylius_shop.provider.order_pay.after_pay_url" />
+        </service>
     </services>
 </container>

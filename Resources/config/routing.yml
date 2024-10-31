@@ -42,6 +42,10 @@ sylius_shop_order:
     resource: "@SyliusShopBundle/Resources/config/routing/order.yml"
     prefix: /order
 
+sylius_shop_payment_request:
+    resource: "@SyliusShopBundle/Resources/config/routing/payment_request.yaml"
+    prefix: /payment-request
+
 sylius_shop_account:
     resource: "@SyliusShopBundle/Resources/config/routing/account.yml"
     prefix: /account
