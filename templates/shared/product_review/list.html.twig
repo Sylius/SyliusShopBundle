@@ -3,7 +3,7 @@
 {% if product_reviews|length > 0 %}
     <div class="mb-5">
         {% for review in product_reviews %}
-            {% hook 'sylius.shop.product_review.index.main.list' with { review } %}
+            {% hook 'sylius.shop.product_review.index.content.main.list' with { review } %}
         {% endfor %}
     </div>
 {% else %}
