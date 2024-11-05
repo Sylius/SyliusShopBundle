@@ -2,7 +2,7 @@ sylius_twig_hooks:
     hooks:
         'sylius_shop.checkout.select_shipping':
             content:
-                template: '@SyliusShop/checkout/select_shipping/content.html.twig'
+                template: '@SyliusShop/checkout/shared/content.html.twig'
                 priority: 0
         'sylius_shop.checkout.select_shipping.content':
             steps:
