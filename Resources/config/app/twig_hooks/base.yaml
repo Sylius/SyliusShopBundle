@@ -1,5 +1,16 @@
 sylius_twig_hooks:
     hooks:
+        'sylius_shop.base#body_classes':
+            d_flex:
+                template: '@SyliusShop/shared/layout/base/body_classes/d_flex.html.twig'
+                priority: 0        
+            flex_column:
+                template: '@SyliusShop/shared/layout/base/body_classes/flex_column.html.twig'
+                priority: 0
+            min_vh_100:                
+                template: '@SyliusShop/shared/layout/base/body_classes/min_vh_100.html.twig'
+                priority: 0
+                
         'sylius_shop.base#stylesheets':
             styles:
                 template: '@SyliusShop/shared/layout/base/styles.html.twig'
