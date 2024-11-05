@@ -7,9 +7,7 @@
 {% set prefixes = ['sylius_shop.checkout'] %}
 
 {% block content %}
-    <div class="mx-auto" style="max-width: var(--bs-breakpoint-lg)">
-        {% hook 'complete' with { _prefixes: prefixes, order, form, active_step } %}
-    </div>
+    {% hook 'complete' with { _prefixes: prefixes, order, form, active_step } %}
 {% endblock %}
 
 {% block sidebar %}
