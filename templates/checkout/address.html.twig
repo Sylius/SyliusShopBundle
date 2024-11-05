@@ -9,7 +9,5 @@
 {% endblock %}
 
 {% block content %}
-    <div class="pe-lg-6">
-        {% hook 'address' with { _prefixes: prefixes, active_step, form, order } %}
-    </div>
+    {% hook 'address' with { _prefixes: prefixes, active_step, form, order } %}
 {% endblock %}
