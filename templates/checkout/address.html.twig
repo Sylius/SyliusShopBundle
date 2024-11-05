@@ -1,7 +1,6 @@
 {% extends '@SyliusShop/checkout/shared/layout.html.twig' %}
 
-{% set checkout_address_hook = 'sylius_shop.checkout' %}
-{% set prefixes = [checkout_address_hook] %}
+{% set prefixes = ['sylius_shop.checkout'] %}
 {% set active_step = 'address' %}
 
 {% block title %}
