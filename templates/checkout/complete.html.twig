@@ -4,10 +4,11 @@
 {% block content_title %}{{ 'sylius.ui.summary_of_your_order'|trans }}{% endblock %}
 
 {% set active_step = 'complete' %}
+{% set prefixes = ['sylius_shop.checkout'] %}
 
 {% block content %}
     <div class="mx-auto" style="max-width: var(--bs-breakpoint-lg)">
-        {% hook 'sylius_shop.checkout.complete' with { order, form, active_step } %}
+        {% hook 'complete' with { _prefixes: prefixes, order, form, active_step } %}
     </div>
 {% endblock %}
 
