@@ -4,6 +4,7 @@ sylius_twig_hooks:
             content:
                 template: '@SyliusShop/checkout/shared/content.html.twig'
                 priority: 0
+
         'sylius_shop.checkout.address.content':
             steps:
                 template: '@SyliusShop/checkout/shared/steps.html.twig'
