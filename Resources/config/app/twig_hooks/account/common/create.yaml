@@ -1,17 +1,22 @@
 sylius_twig_hooks:
     hooks:
         'sylius_shop.account.common.create':
-            breadcrumbs:
-                template: '@SyliusShop/account/common/layout/breadcrumbs.html.twig'
-                priority: 200
-            menu:
-                template: '@SyliusShop/account/common/layout/menu.html.twig'
-                priority: 100
             content:
-                template: '@SyliusShop/account/common/layout/content.html.twig'
+                template: '@SyliusShop/account/common/content.html.twig'
                 priority: 0
 
         'sylius_shop.account.common.create.content':
+            breadcrumbs:
+                template: '@SyliusShop/account/common/content/breadcrumbs.html.twig'
+                priority: 200
+            menu:
+                template: '@SyliusShop/account/common/content/menu.html.twig'
+                priority: 100
+            main:
+                template: '@SyliusShop/account/common/content/main.html.twig'
+                priority: 0
+
+        'sylius_shop.account.common.create.content.main':
             header:
-                template: '@SyliusShop/account/common/layout/content/header.html.twig'
+                template: '@SyliusShop/account/common/content/main/header.html.twig'
                 priority: 0

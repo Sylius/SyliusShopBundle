@@ -4,9 +4,5 @@
 {% set attrs = attrs|default([]) %}
 
 {% block content %}
-    <div class="container mb-auto">
-        <div class="row my-4">
-            {% hook 'create' with { _prefixes: prefixes, ...attrs } %}
-        </div>
-    </div>
+    {% hook 'create' with { _prefixes: prefixes, ...attrs } %}
 {% endblock %}
