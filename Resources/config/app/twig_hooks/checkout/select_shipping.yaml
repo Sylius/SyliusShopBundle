@@ -2,12 +2,12 @@ sylius_twig_hooks:
     hooks:
         'sylius_shop.checkout.select_shipping':
             content:
-                template: '@SyliusShop/checkout/shared/content.html.twig'
+                template: '@SyliusShop/checkout/common/content.html.twig'
                 priority: 0
 
         'sylius_shop.checkout.select_shipping.content':
             steps:
-                template: '@SyliusShop/checkout/shared/steps.html.twig'
+                template: '@SyliusShop/checkout/common/steps.html.twig'
                 priority: 100
             form:
                 component: 'sylius_shop:checkout:shipping:form'

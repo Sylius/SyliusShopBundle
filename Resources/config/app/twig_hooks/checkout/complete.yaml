@@ -7,7 +7,7 @@ sylius_twig_hooks:
 
         'sylius_shop.checkout.complete.content':
             steps:
-                template: '@SyliusShop/checkout/shared/steps.html.twig'
+                template: '@SyliusShop/checkout/common/steps.html.twig'
                 priority: 300
             header:
                 template: '@SyliusShop/checkout/complete/content/header.html.twig'
