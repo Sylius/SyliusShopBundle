@@ -1,6 +1,11 @@
 sylius_twig_hooks:
     hooks:
         'sylius_shop.checkout.address':
+            content:
+                template: '@SyliusShop/checkout/shared/content.html.twig'
+                priority: 0
+
+        'sylius_shop.checkout.address.content':
             steps:
                 template: '@SyliusShop/checkout/shared/steps.html.twig'
                 priority: 100
@@ -9,64 +14,64 @@ sylius_twig_hooks:
                 props:
                     resource: '@=_context.order'
                     form: '@=_context.form'
-                    template: '@SyliusShop/checkout/address/form.html.twig'
+                    template: '@SyliusShop/checkout/address/content/form.html.twig'
                 priority: 0
 
-        'sylius_shop.checkout.address.form':
+        'sylius_shop.checkout.address.content.form':
             header:
-                template: '@SyliusShop/checkout/address/form/header.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/header.html.twig'
                 priority: 300
             user:
-                template: '@SyliusShop/checkout/address/form/user.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/user.html.twig'
                 priority: 200
             addresses:
-                template: '@SyliusShop/checkout/address/form/addresses.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses.html.twig'
                 priority: 100
             navigation:
-                template: '@SyliusShop/checkout/address/form/navigation.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/navigation.html.twig'
                 priority: 0
 
-        'sylius_shop.checkout.address.form.addresses#billing_required':
+        'sylius_shop.checkout.address.content.form.addresses#billing_required':
             billing_address:
-                template: '@SyliusShop/checkout/address/form/addresses/address.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses/address.html.twig'
                 configuration:
                     type: 'billing'
                 priority: 200
             different_shipping_address:
-                template: '@SyliusShop/checkout/address/form/addresses/different_address.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses/different_address.html.twig'
                 configuration:
                     type: 'shipping'
                     field: 'differentShippingAddress'
                 priority: 100
             shipping_address:
-                template: '@SyliusShop/checkout/address/form/addresses/address.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses/address.html.twig'
                 configuration:
                     type: 'shipping'
                     isDifferentAddress: true
                 priority: 0
 
-        'sylius_shop.checkout.address.form.addresses#shipping_required':
+        'sylius_shop.checkout.address.content.form.addresses#shipping_required':
             shipping_address:
-                template: '@SyliusShop/checkout/address/form/addresses/address.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses/address.html.twig'
                 configuration:
                     type: 'shipping'
                 priority: 200
             different_billing_address:
-                template: '@SyliusShop/checkout/address/form/addresses/different_address.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses/different_address.html.twig'
                 configuration:
                     type: 'billing'
                     field: 'differentBillingAddress'
                 priority: 100
             billing_address:
-                template: '@SyliusShop/checkout/address/form/addresses/address.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses/address.html.twig'
                 configuration:
                     type: 'billing'
                     isDifferentAddress: true
                 priority: 0
 
-        'sylius_shop.checkout.address.form.addresses.billing_address':
+        'sylius_shop.checkout.address.content.form.addresses.billing_address':
             header:
-                template: '@SyliusShop/checkout/address/form/addresses/address/header.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses/address/header.html.twig'
                 configuration:
                     title: 'sylius.ui.billing_address'
                 priority: 200
@@ -74,17 +79,17 @@ sylius_twig_hooks:
                 component: 'sylius_shop:checkout:address:address_book'
                 props:
                     field: 'billingAddress'
-                    template: '@SyliusShop/checkout/address/form/addresses/address/address_book.html.twig'
+                    template: '@SyliusShop/checkout/address/content/form/addresses/address/address_book.html.twig'
                 priority: 100
             form:
-                template: '@SyliusShop/checkout/address/form/addresses/address/form.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses/address/form.html.twig'
                 configuration:
                     field: 'billingAddress'
                 priority: 0
 
-        'sylius_shop.checkout.address.form.addresses.shipping_address':
+        'sylius_shop.checkout.address.content.form.addresses.shipping_address':
             header:
-                template: '@SyliusShop/checkout/address/form/addresses/address/header.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses/address/header.html.twig'
                 configuration:
                     title: 'sylius.ui.shipping_address'
                 priority: 200
@@ -92,10 +97,10 @@ sylius_twig_hooks:
                 component: 'sylius_shop:checkout:address:address_book'
                 props:
                     field: 'shippingAddress'
-                    template: '@SyliusShop/checkout/address/form/addresses/address/address_book.html.twig'
+                    template: '@SyliusShop/checkout/address/content/form/addresses/address/address_book.html.twig'
                 priority: 100
             form:
-                template: '@SyliusShop/checkout/address/form/addresses/address/form.html.twig'
+                template: '@SyliusShop/checkout/address/content/form/addresses/address/form.html.twig'
                 configuration:
                     field: 'shippingAddress'
                 priority: 0
