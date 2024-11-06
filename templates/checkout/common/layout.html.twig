@@ -5,7 +5,7 @@
         <div class="bg-white border-bottom py-4">
             <div class="container">
                 <div class="row align-items-center">
-                    {% hook 'sylius_shop.checkout.shared.header' with { order } %}
+                    {% hook 'sylius_shop.checkout.common.header' with { order } %}
                 </div>
             </div>
         </div>
@@ -18,7 +18,7 @@
                     </div>
                     {% block sidebar %}
                         <div class="col-12 col-lg-5 py-5 ps-lg-6 position-relative checkout-sidebar">
-                            {% hook 'sylius_shop.checkout.shared.sidebar' with { order } %}
+                            {% hook 'sylius_shop.checkout.common.sidebar' with { order } %}
                         </div>
                     {% endblock %}
                 </div>
