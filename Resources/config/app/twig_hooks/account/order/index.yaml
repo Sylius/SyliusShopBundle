@@ -12,8 +12,8 @@ sylius_twig_hooks:
                 priority: 0
 
         'sylius_shop.account.order.index.content.main':
-            main_section:
-                template: '@SyliusShop/account/order/index/content/main/main_section.html.twig'
+            grid:
+                template: '@SyliusShop/shared/grid.html.twig'
                 priority: 0
 
         'sylius_shop.account.order.index.content.main.header':
@@ -22,9 +22,4 @@ sylius_twig_hooks:
                 priority: 100
             subtitle:
                 template: '@SyliusShop/account/order/index/content/main/header/subtitle.html.twig'
-                priority: 0
-
-        'sylius_shop.account.order.index.content.main.main_section':
-            grid:
-                template: '@SyliusShop/shared/grid.html.twig'
                 priority: 0
