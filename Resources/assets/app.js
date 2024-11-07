@@ -20,3 +20,5 @@ export const app = startStimulusApp(require.context(
 
 app.register('live', LiveController);
 app.register('api-login', ApiLoginController);
+
+app.debug = process.env.NODE_ENV !== 'production';
