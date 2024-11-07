@@ -25,7 +25,7 @@
 
     <body data-route="{{ app.request.get('_route') }}">
         {% block body %}
-            <div class="d-flex flex-column min-vh-100">
+            <div class="{% apply escape %}{% hook '#body_classes' with { _prefixes: prefixes } %}{% endapply %}">
                 {% block header %}
                     {% hook 'header' with { _prefixes: prefixes } %}
                 {% endblock %}
