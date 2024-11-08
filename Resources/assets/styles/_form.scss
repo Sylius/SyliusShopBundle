@@ -1,4 +1,5 @@
-.form-label.required::after {
+.form-label.required::after,
+.col-form-label.required::after {
     content: "*";
     padding-left: 3px;
     color: $danger;
