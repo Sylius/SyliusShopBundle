@@ -1,5 +1,5 @@
 {% macro default(url, message, id, icon, class) %}
-    <a class="btn d-flex align-items-center justify-content-center gap-1 {% if class is not empty %}{{ class }}{% endif %}" {% if id is not null %} id="{{ id }}"{% endif %} href="{{ url }}" {{ sylius_test_html_attribute('button', id|default(message)) }}>
+    <a class="btn {% if class is not empty %}{{ class }}{% endif %}" {% if id is not null %} id="{{ id }}"{% endif %} href="{{ url }}" {{ sylius_test_html_attribute('button', id|default(message)) }}>
         {% if icon is not empty %}
             {{ ux_icon(icon, { class: 'icon icon-sm flex-shrink-0' }) }}
         {% endif %}
