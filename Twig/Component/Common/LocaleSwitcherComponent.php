@@ -22,8 +22,8 @@ use Symfony\UX\TwigComponent\Attribute\ExposeInTemplate;
 readonly class LocaleSwitcherComponent
 {
     public function __construct(
-        private LocaleContextInterface $localeContext,
-        private LocaleProviderInterface $localeProvider,
+        protected LocaleContextInterface $localeContext,
+        protected LocaleProviderInterface $localeProvider,
     ) {
     }
 

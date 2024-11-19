@@ -36,8 +36,8 @@ class ChangePasswordFormComponent
 
     /** @param class-string $formClass */
     public function __construct(
-        private readonly FormFactoryInterface $formFactory,
-        private readonly string $formClass,
+        protected readonly FormFactoryInterface $formFactory,
+        protected readonly string $formClass,
     ) {
     }
 

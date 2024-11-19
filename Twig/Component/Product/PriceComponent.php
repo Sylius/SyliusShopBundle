@@ -43,12 +43,12 @@ class PriceComponent
     public bool $hasDiscount = false;
 
     public function __construct(
-        private readonly ProductVariantPricesCalculatorInterface $productVariantPricesCalculator,
-        private readonly MoneyFormatterInterface $moneyFormatter,
-        private readonly ChannelContextInterface $channelContext,
-        private readonly LocaleContextInterface $localeContext,
-        private readonly CurrencyContextInterface $currencyContext,
-        private readonly CurrencyConverterInterface $currencyConverter,
+        protected readonly ProductVariantPricesCalculatorInterface $productVariantPricesCalculator,
+        protected readonly MoneyFormatterInterface $moneyFormatter,
+        protected readonly ChannelContextInterface $channelContext,
+        protected readonly LocaleContextInterface $localeContext,
+        protected readonly CurrencyContextInterface $currencyContext,
+        protected readonly CurrencyConverterInterface $currencyConverter,
     ) {
     }
 

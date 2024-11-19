@@ -30,9 +30,9 @@ class BySlugComponent
      * @param ProductRepositoryInterface<ProductInterface> $productRepository
      */
     public function __construct(
-        private readonly ProductRepositoryInterface $productRepository,
-        private readonly ChannelContextInterface $channelContext,
-        private readonly LocaleContextInterface $localeContext,
+        protected readonly ProductRepositoryInterface $productRepository,
+        protected readonly ChannelContextInterface $channelContext,
+        protected readonly LocaleContextInterface $localeContext,
     ) {
     }
 

@@ -31,8 +31,8 @@ class AssociationComponent
      * @param ProductAssociationRepositoryInterface<ProductAssociationInterface> $productAssociationRepository
      */
     public function __construct(
-        private readonly ProductAssociationRepositoryInterface $productAssociationRepository,
-        private readonly ChannelContextInterface $channelContext,
+        protected readonly ProductAssociationRepositoryInterface $productAssociationRepository,
+        protected readonly ChannelContextInterface $channelContext,
     ) {
     }
 

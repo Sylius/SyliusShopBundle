@@ -41,7 +41,7 @@ class AddressBookComponent
     public string $field;
 
     public function __construct(
-        private readonly CustomerContextInterface $customerContext,
+        protected readonly CustomerContextInterface $customerContext,
     ) {
     }
 

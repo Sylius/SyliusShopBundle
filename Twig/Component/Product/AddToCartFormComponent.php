@@ -15,7 +15,7 @@ namespace Sylius\Bundle\ShopBundle\Twig\Component\Product;
 
 use Doctrine\Persistence\ObjectManager;
 use Sylius\Bundle\CoreBundle\Provider\FlashBagProvider;
-use Sylius\Bundle\OrderBundle\Factory\AddToCartCommandFactory;
+use Sylius\Bundle\OrderBundle\Factory\AddToCartCommandFactoryInterface;
 use Sylius\Bundle\ShopBundle\Twig\Component\Product\Trait\ProductLivePropTrait;
 use Sylius\Bundle\ShopBundle\Twig\Component\Product\Trait\ProductVariantLivePropTrait;
 use Sylius\Bundle\UiBundle\Twig\Component\TemplatePropTrait;
@@ -71,15 +71,15 @@ class AddToCartFormComponent
      * @param ProductVariantRepositoryInterface<ProductVariantInterface> $productVariantRepository
      */
     public function __construct(
-        private readonly FormFactoryInterface $formFactory,
-        private readonly ObjectManager $manager,
-        private readonly RouterInterface $router,
-        private readonly RequestStack $requestStack,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly CartContextInterface $cartContext,
-        private readonly AddToCartCommandFactory $addToCartCommandFactory,
-        private readonly CartItemFactoryInterface $cartItemFactory,
-        private readonly string $formClass,
+        protected readonly FormFactoryInterface $formFactory,
+        protected readonly ObjectManager $manager,
+        protected readonly RouterInterface $router,
+        protected readonly RequestStack $requestStack,
+        protected readonly EventDispatcherInterface $eventDispatcher,
+        protected readonly CartContextInterface $cartContext,
+        protected readonly AddToCartCommandFactoryInterface $addToCartCommandFactory,
+        protected readonly CartItemFactoryInterface $cartItemFactory,
+        protected readonly string $formClass,
         ProductRepositoryInterface $productRepository,
         ProductVariantRepositoryInterface $productVariantRepository,
     ) {

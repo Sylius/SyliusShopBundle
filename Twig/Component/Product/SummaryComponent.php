@@ -42,7 +42,7 @@ class SummaryComponent
      * @param ProductVariantRepositoryInterface<ProductVariantInterface> $productVariantRepository
      */
     public function __construct(
-        private readonly ProductVariantResolverInterface $productVariantResolver,
+        protected readonly ProductVariantResolverInterface $productVariantResolver,
         ProductRepositoryInterface $productRepository,
         ProductVariantRepositoryInterface $productVariantRepository,
     ) {

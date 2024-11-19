@@ -24,8 +24,8 @@ use Symfony\UX\TwigComponent\Attribute\ExposeInTemplate;
 readonly class CurrencySwitcherComponent
 {
     public function __construct(
-        private ChannelContextInterface $channelContext,
-        private CurrencyContextInterface $currencyContext,
+        protected ChannelContextInterface $channelContext,
+        protected CurrencyContextInterface $currencyContext,
     ) {
     }
 

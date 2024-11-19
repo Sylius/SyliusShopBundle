@@ -28,9 +28,9 @@ readonly class TaxonMenuComponent
      * @param TaxonRepositoryInterface<TaxonInterface> $taxonRepository
      */
     public function __construct(
-        private TaxonRepositoryInterface $taxonRepository,
-        private ChannelContextInterface $channelContext,
-        private LocaleContextInterface $localeContext,
+        protected TaxonRepositoryInterface $taxonRepository,
+        protected ChannelContextInterface $channelContext,
+        protected LocaleContextInterface $localeContext,
     ) {
     }
 
