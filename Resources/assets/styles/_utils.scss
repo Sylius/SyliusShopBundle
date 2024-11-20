@@ -39,3 +39,8 @@ $positions: 40px, 50px, 80px;
 .w-full {
     width: 100%;
 }
+
+// Contrast fix
+.bg-success-subtle.text-success {
+    color: #157247 !important;
+}

@@ -10,7 +10,8 @@
 
         <title>{% block title %}{{ sylius.channel.name }}{% endblock %}</title>
 
-        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" name="viewport">
+        <meta name="description" content="Explore the Sylius demo – a flexible e-commerce platform built on Symfony. Discover features to customize your online store and test its capabilities!"/>
 
         {% block metatags %}
             {% hook '#metatags' with { _prefixes: prefixes } %}
