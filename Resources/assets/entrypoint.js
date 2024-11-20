@@ -14,5 +14,5 @@ import './app';
 import './scripts/bootstrap';
 import './scripts/spotlight';
 
-const imagesContext = require.context('./images', true, /\.(jpg|jpeg|png|svg|gif)$/);
+const imagesContext = require.context('./images', true, /\.(jpg|jpeg|png|svg|gif|webp)$/);
 imagesContext.keys().forEach(imagesContext);

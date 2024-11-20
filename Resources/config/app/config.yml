@@ -46,15 +46,23 @@ liip_imagine:
     filter_sets:
         sylius_shop_product_original: ~
         sylius_shop_product_small_thumbnail:
+            format: webp
+            quality: 80
             filters:
                 thumbnail: { size: [300, 400], mode: outbound }
         sylius_shop_product_thumbnail:
+            format: webp
+            quality: 80
             filters:
                 thumbnail: { size: [600, 800], mode: outbound }
         sylius_shop_product_large_thumbnail:
+            format: webp
+            quality: 80
             filters:
                 thumbnail: { size: [1200, 1600], mode: outbound }
         sylius_shop_taxon_thumbnail:
+            format: webp
+            quality: 80
             filters:
                 thumbnail: { size: [1200, 300], mode: outbound }
 
