@@ -37,6 +37,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
+use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\Attribute\PreReRender;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
@@ -106,9 +107,14 @@ class AddToCartFormComponent
         $this->emitUp(self::SYLIUS_SHOP_VARIANT_CHANGED, ['variantId' => $this->variant?->getId()]);
     }
 
+    /** @param array<string, mixed> $routeParameters */
     #[LiveAction]
-    public function addToCart(): RedirectResponse
-    {
+    public function addToCart(
+        #[LiveArg] ?string $routeName = null,
+        #[LiveArg] array $routeParameters = [],
+        #[LiveArg] ?string $idRouteParameter = null,
+        #[LiveArg] bool $addFlashMessage = true,
+    ): RedirectResponse {
         $this->submitForm();
         $addToCartCommand = $this->getForm()->getData();
 
@@ -116,13 +122,17 @@ class AddToCartFormComponent
         $this->manager->persist($addToCartCommand->getCart());
         $this->manager->flush();
 
-        FlashBagProvider
-            ::getFlashBag($this->requestStack)
-            ->add('success', 'sylius.cart.add_item');
+        if ($addFlashMessage) {
+            FlashBagProvider::getFlashBag($this->requestStack)->add('success', 'sylius.cart.add_item');
+        }
+
+        if ($idRouteParameter !== null) {
+            $routeParameters[$idRouteParameter] = $addToCartCommand->getCart()->getId();
+        }
 
         return new RedirectResponse($this->router->generate(
-            $this->routeName,
-            $this->routeParameters,
+            $routeName ?? $this->routeName,
+            array_merge($this->routeParameters, $routeParameters),
         ));
     }
 
