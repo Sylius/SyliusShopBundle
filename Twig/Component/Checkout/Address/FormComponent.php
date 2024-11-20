@@ -49,9 +49,9 @@ class FormComponent
         FormFactoryInterface $formFactory,
         string $resourceClass,
         string $formClass,
-        private readonly CustomerContextInterface $customerContext,
-        private readonly UserRepositoryInterface $shopUserRepository,
-        private readonly AddressRepositoryInterface $addressRepository,
+        protected readonly CustomerContextInterface $customerContext,
+        protected readonly UserRepositoryInterface $shopUserRepository,
+        protected readonly AddressRepositoryInterface $addressRepository,
     ) {
         $this->initialize($repository, $formFactory, $resourceClass, $formClass);
     }

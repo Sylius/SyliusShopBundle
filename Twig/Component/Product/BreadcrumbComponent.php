@@ -27,9 +27,9 @@ readonly class BreadcrumbComponent
      * @param TaxonRepositoryInterface<TaxonInterface> $taxonRepository
      */
     public function __construct(
-        private RequestStack $requestStack,
-        private TaxonRepositoryInterface $taxonRepository,
-        private LocaleContextInterface $localeContext,
+        protected RequestStack $requestStack,
+        protected TaxonRepositoryInterface $taxonRepository,
+        protected LocaleContextInterface $localeContext,
     ) {
     }
 

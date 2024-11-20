@@ -50,8 +50,8 @@ class FormComponent
         FormFactoryInterface $formFactory,
         string $resourceClass,
         string $formClass,
-        private readonly ObjectManager $manager,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        protected readonly ObjectManager $manager,
+        protected readonly EventDispatcherInterface $eventDispatcher,
     ) {
         $this->initialize($orderRepository, $formFactory, $resourceClass, $formClass);
     }

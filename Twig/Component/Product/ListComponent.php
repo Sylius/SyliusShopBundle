@@ -33,9 +33,9 @@ class ListComponent
 
     /** @param ProductRepositoryInterface<ProductInterface> $productRepository */
     public function __construct(
-        private readonly ProductRepositoryInterface $productRepository,
-        private readonly LocaleContextInterface $localeContext,
-        private readonly ChannelContextInterface $channelContext,
+        protected readonly ProductRepositoryInterface $productRepository,
+        protected readonly LocaleContextInterface $localeContext,
+        protected readonly ChannelContextInterface $channelContext,
     ) {
     }
 

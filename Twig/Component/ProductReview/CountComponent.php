@@ -27,7 +27,7 @@ class CountComponent
     /**
      * @param ProductReviewRepositoryInterface<ProductReview> $productReviewRepository
      */
-    public function __construct(private readonly ProductReviewRepositoryInterface $productReviewRepository)
+    public function __construct(protected readonly ProductReviewRepositoryInterface $productReviewRepository)
     {
     }
 

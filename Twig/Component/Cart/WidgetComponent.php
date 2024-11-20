@@ -43,7 +43,7 @@ class WidgetComponent
 
     /** @param OrderRepositoryInterface<OrderInterface> $orderRepository */
     public function __construct(
-        private readonly CartContextInterface $cartContext,
+        protected readonly CartContextInterface $cartContext,
         OrderRepositoryInterface $orderRepository,
     ) {
         $this->initialize($orderRepository);

@@ -41,11 +41,11 @@ class CardComponent
      * @param ProductRepositoryInterface<ProductInterface> $productRepository
      */
     public function __construct(
-        private readonly ProductRepositoryInterface $productRepository,
-        private readonly ProductVariantResolverInterface $productVariantResolver,
-        private readonly ChannelContextInterface $channelContext,
-        private readonly LocaleContextInterface $localeContext,
-        private readonly ProductVariantPricesCalculatorInterface $productVariantPricesCalculator,
+        protected readonly ProductRepositoryInterface $productRepository,
+        protected readonly ProductVariantResolverInterface $productVariantResolver,
+        protected readonly ChannelContextInterface $channelContext,
+        protected readonly LocaleContextInterface $localeContext,
+        protected readonly ProductVariantPricesCalculatorInterface $productVariantPricesCalculator,
     ) {
     }
 
