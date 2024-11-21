@@ -110,10 +110,14 @@ class AddToCartFormComponent
     /** @param array<string, mixed> $routeParameters */
     #[LiveAction]
     public function addToCart(
-        #[LiveArg] ?string $routeName = null,
-        #[LiveArg] array $routeParameters = [],
-        #[LiveArg] ?string $idRouteParameter = null,
-        #[LiveArg] bool $addFlashMessage = true,
+        #[LiveArg]
+        ?string $routeName = null,
+        #[LiveArg]
+        array $routeParameters = [],
+        #[LiveArg]
+        ?string $idRouteParameter = null,
+        #[LiveArg]
+        bool $addFlashMessage = true,
     ): RedirectResponse {
         $this->submitForm();
         $addToCartCommand = $this->getForm()->getData();
