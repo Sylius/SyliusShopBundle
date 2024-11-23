@@ -10,9 +10,10 @@
 
         <title>{% block title %}{{ sylius.channel.name }}{% endblock %}</title>
 
-        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" name="viewport">
 
         {% block metatags %}
+            <meta name="description" content="{{ 'sylius.meta_description'|trans }}"/>
             {% hook '#metatags' with { _prefixes: prefixes } %}
         {% endblock %}
 
