@@ -1,6 +1,6 @@
 {% set product = hookable_metadata.context.product %}
 
-<div class="mb-3">
+<div class="col pe-lg-5 pe-xxl-5">
     <a href="{{ hookable_metadata.context.original_path }}" class="d-block overflow-auto bg-light rounded-3 spotlight">
         <img src="{{ hookable_metadata.context.path }}" alt="{{ product.name }}" class="img-fluid w-100 h-100 object-fit-cover"
             {% if product.images.first %}
