@@ -18,13 +18,13 @@ export default class extends Controller {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
+                'X-Requested-With': 'XMLHttpRequest'
             },
             body: JSON.stringify({
                 _username: this.emailTarget.value,
                 _password: this.passwordTarget.value,
-                [this.csrfTokenTarget.name]: this.csrfTokenTarget.value,
-            }),
+                [this.csrfTokenTarget.name]: this.csrfTokenTarget.value
+            })
         };
 
         fetch(this.urlValue, requestOptions)
