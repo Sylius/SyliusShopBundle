@@ -5,16 +5,11 @@
 
 <html lang="{{ app.request.locale|slice(0, 2) }}">
     <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-        <title>{% block title %}{{ sylius.channel.name }}{% endblock %}</title>
-
-        <meta content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" name="viewport">
-
         {% block metatags %}
             {% hook '#metatags' with { _prefixes: prefixes } %}
         {% endblock %}
+
+        <title>{% block title %}{{ sylius.channel.name }}{% endblock %}</title>
 
         {% block stylesheets %}
             {% hook '#stylesheets' with { _prefixes: prefixes } %}

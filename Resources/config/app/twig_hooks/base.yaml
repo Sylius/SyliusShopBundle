@@ -3,8 +3,13 @@ sylius_twig_hooks:
         'sylius_shop.base#body_classes':
             defaults:
                 template: '@SyliusShop/shared/layout/base/body_classes/defaults.html.twig'
-                priority: 0     
+                priority: 0
                 
+        'sylius_shop.base#metatags':
+            metatags:
+                template: '@SyliusShop/shared/layout/base/metatags.html.twig'
+                priority: 0
+        
         'sylius_shop.base#stylesheets':
             styles:
                 template: '@SyliusShop/shared/layout/base/styles.html.twig'
