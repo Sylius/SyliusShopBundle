@@ -18,7 +18,7 @@
 >
     <services>
         <service id="sylius_shop.locale_switcher" class="Sylius\Bundle\ShopBundle\Locale\StorageBasedLocaleSwitcher">
-            <argument type="service" id="sylius_shop.locale_storage" />
+            <argument type="service" id="sylius_shop.storage.locale" />
             <argument type="service" id="sylius.context.channel" />
         </service>
 
