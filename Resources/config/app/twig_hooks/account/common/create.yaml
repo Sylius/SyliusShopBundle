@@ -16,6 +16,11 @@ sylius_twig_hooks:
                 template: '@SyliusShop/account/common/content/main.html.twig'
                 priority: 0
 
+        'sylius_shop.account.common.create.content.menu':
+            account:
+                template: '@SyliusShop/account/common/content/menu/account.html.twig'
+                priority: 0
+
         'sylius_shop.account.common.create.content.main':
             header:
                 template: '@SyliusShop/account/common/content/main/header.html.twig'
