@@ -35,14 +35,28 @@
                     {% for action in definition.getEnabledActions('item')|sylius_sort_by('position') %}
                         {{ sylius_grid_render_action(grid, action, row) }}
                     {% endfor %}
+
+                    {% if definition.actionGroups.subitem is defined and definition.getEnabledActions('subitem')|length > 0 %}
+                        {% set subactions %}
+                            {% for action in definition.getEnabledActions('subitem')|sylius_sort_by('position') %}
+                                {{ sylius_grid_render_action(grid, action, row) }}
+                            {% endfor %}
+                        {% endset %}
+                        {% if subactions|trim|length > 0 %}
+                            <div class="dropdown">
+                                <div data-bs-toggle="dropdown">
+                                    <button class="btn btn-sm btn-outline-gray dropdown-static" data-bs-toggle="tooltip" data-bs-title="{{ 'sylius.ui.more'|trans }}">
+                                        {{ ux_icon('tabler:dots', { class: 'icon icon-sm flex-shrink-0' }) }}
+                                    </button>
+                                </div>
+
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    {{ subactions }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
                 </div>
-                {% if definition.actionGroups.subitem is defined and definition.getEnabledActions('subitem')|length > 0 %}
-                    <div class="d-flex gap-1 justify-content-end">
-                        {% for action in definition.getEnabledActions('subitem')|sylius_sort_by('position') %}
-                            {{ sylius_grid_render_action(grid, action, row) }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
             </td>
         {% endif %}
     </tr>
