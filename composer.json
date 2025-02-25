@@ -34,6 +34,9 @@
         "sylius/theme-bundle": "^2.4",
         "symfony/framework-bundle": "^6.4.1 || ^7.1",
         "symfony/security-bundle": "^6.4 || ^7.1",
+        "symfony/stimulus-bundle": "^2.20",
+        "symfony/ux-autocomplete": "^2.20",
+        "symfony/ux-live-component": "^2.20",
         "symfony/webpack-encore-bundle": "^2.2",
         "symfonycasts/dynamic-forms": "^0.1",
         "twig/twig": "^3.14"
