@@ -37,3 +37,8 @@ sylius_twig_hooks:
             currency:
                 template: "@SyliusShop/account/order/show/content/main/header/details/currency.html.twig"
                 priority: 0
+                
+        'sylius_shop.account.order.show.content.main.header.buttons':
+            pay_button:
+                template: "@SyliusShop/account/order/show/content/main/header/buttons/pay_button.html.twig"
+                priority: 0
