@@ -24,7 +24,7 @@
     {{ sylius_template_event('sylius.shop.layout.head') }}
 </head>
 
-<body class="pushable" {{ rtl.default(app.locale) }}>
+<body class="pushable" {{ rtl.default(sylius.localeCode) }}>
 {{ sylius_template_event('sylius.shop.layout.before_body') }}
 <div class="pusher" data-route="{{ app.request.get('_route') }}">
     {% block top %}
