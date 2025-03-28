@@ -69,4 +69,80 @@
   .address-card .buttons .ui.button, .address-card .buttons .ui.basic.button, .address-card .buttons .ui.labeled.button, .address-card .buttons .ui.labeled.icon.button, .address-card .buttons .buttons .ui.labeled.icon.button {
     padding: 6px 0 6px 10px !important;
   }
+
+  button, a {
+    .icon.arrow:not(.down):not(.up) {
+      transform: rotate(180deg);
+    }
+  }
+
+  .ui.radio.checkbox .box:before, .ui.radio.checkbox label:before, .ui.radio.checkbox label:after {
+    left: unset;
+    right: 0;
+  }
+
+  @media (min-width: 768px) {
+    [data-route="sylius_shop_product_index"] .twelve.wide.column .ui.segment {
+      width: 600px;
+      transform: translate(122px, -70px);
+    }
+  }
+
+  @media (min-width: 1150px) {
+    [data-route="sylius_shop_product_index"] .twelve.wide.column .ui.segment {
+      width: 900px;
+      transform: translate(122px, -70px);
+    }
+  }
+
+  [data-route=sylius_shop_product_index] .ui.fluid.vertical.menu .item:not(.header) {
+    padding: 10px 26px 10px 0 !important;
+  }
+
+  .ui.vertical.menu .item > i.icon {
+    float: left;
+    margin: 0 0.5em 0 0;
+  }
+
+  .ui[class*="right floated"].header {
+    float: left;
+    margin-left: 0;
+    margin-right: 0.5em;
+  }
+
+  .ui.table[class*="right aligned"], .ui.table [class*="right aligned"] {
+    text-align: left;
+  }
+
+  .ui.items > .item .extra > [class*="right floated"] {
+    margin: 0.25rem 0.5rem 0.25rem 0;
+  }
+
+  .ui.items > .item [class*="right floated"] {
+    float: left;
+  }
+
+  [data-route=sylius_shop_cart_summary] .column:first-child .table th:nth-child(4), [data-route=sylius_shop_cart_save] .column:first-child .table th:nth-child(4), [data-route=sylius_shop_cart_checkout] .column:first-child .table th:nth-child(4), [data-route=sylius_shop_checkout_complete] form table th:nth-child(4), [data-route=sylius_shop_account_order_show] table th:nth-child(4) {
+    text-align: left !important;
+  }
+
+  .ui.labeled.icon.buttons > .button > .icon, .ui.labeled.icon.button > .icon {
+    left: unset;
+    right: 0;
+  }
+
+  .ui.menu:not(.vertical) .right.item, .ui.menu:not(.vertical) .right.menu {
+    margin-right: auto!important;
+    margin-left: unset!important;
+  }
+
+  .ui.header > img + .content, .ui.header > .image + .content {
+    padding-left: unset;
+    padding-right: 0.75rem;
+  }
+
+  .ui.labeled.icon.button, .buttons .ui.labeled.icon.button {
+    padding-left: 24px!important;
+    padding-right: 62px !important;
+  }
 }
