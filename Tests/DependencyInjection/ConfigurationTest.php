@@ -21,9 +21,7 @@ final class ConfigurationTest extends TestCase
 {
     use ConfigurationTestCaseTrait;
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_has_default_configuration_for_locale_switching_strategy(): void
     {
         $this->assertProcessedConfigurationEquals(
@@ -33,9 +31,7 @@ final class ConfigurationTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function its_locale_switching_strategy_can_only_be_url_and_storage(): void
     {
         $this->assertConfigurationIsValid([[
@@ -63,9 +59,7 @@ final class ConfigurationTest extends TestCase
         ]]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_has_default_configuration_for_firewall_context_name_node(): void
     {
         $this->assertProcessedConfigurationEquals(
@@ -75,9 +69,7 @@ final class ConfigurationTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_has_default_configuration_for_checkout_resolver_node(): void
     {
         $this->assertProcessedConfigurationEquals(
@@ -91,9 +83,7 @@ final class ConfigurationTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function its_checkout_resolver_pattern_accept_only_string_value(): void
     {
         $this->assertConfigurationIsInvalid([[
@@ -121,9 +111,7 @@ final class ConfigurationTest extends TestCase
         ]]);
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function its_checkout_route_map_it_is_configurable(): void
     {
         $this->assertProcessedConfigurationEquals(
@@ -148,9 +136,7 @@ final class ConfigurationTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function its_checkout_route_map_route_cannot_be_empty(): void
     {
         $this->assertConfigurationIsInvalid([[
