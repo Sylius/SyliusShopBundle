@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Sylius\Bundle\ShopBundle\Tests\DependencyInjection;
 
-use PHPUnit\Framework\Attributes\Test;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use Sylius\Bundle\ShopBundle\DependencyInjection\SyliusShopExtension;
 use Sylius\Bundle\ShopBundle\Locale\StorageBasedLocaleSwitcher;
 use Sylius\Bundle\ShopBundle\Locale\UrlBasedLocaleSwitcher;
