@@ -33,6 +33,22 @@ sylius_twig_hooks:
                     template: '@SyliusShop/product/common/card.html.twig'
                 priority: 0
 
+        'sylius.shop.product_review.index.content.sidebar.product_card':
+            details:
+                template: "@SyliusShop/product/common/product_card/details.html.twig"
+                priority: 100
+            price:
+                template: "@SyliusShop/product/common/product_card/price.html.twig"
+                priority: 0
+                
+        'sylius.shop.product_review.index.content.sidebar.product_card.details':
+            image:
+                template: "@SyliusShop/product/common/product_card/details/image.html.twig"
+                priority: 100
+            name:
+                template: "@SyliusShop/product/common/product_card/details/name.html.twig"
+                priority: 0
+                
         'sylius.shop.product_review.index.content.main':
             header:
                 template: "@SyliusShop/product_review/index/content/main/header.html.twig"
