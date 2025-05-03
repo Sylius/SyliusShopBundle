@@ -11,7 +11,11 @@ const path = require('path');
 const Encore = require('@symfony/webpack-encore');
 
 class SyliusShop {
-    static getWebpackConfig(rootDir) {
+    /**
+     * Provide a light Webpack configuration for Sylius Admin
+     * All the stimulus stuff should be handled by the app.shop entrypoint
+     */
+    static getBaseWebpackConfig(rootDir) {
         this._prepareWebpackConfig(rootDir);
         Encore
             .addEntry('shop-entry', path.resolve(__dirname, 'Resources/assets/entrypoint.js'))
@@ -26,7 +30,12 @@ class SyliusShop {
         return shopConfig;
     }
 
-    static _getInternalWebpackConfig(rootDir) {
+    /**
+     * For a ready-to-use Stimulus bridge. Should be used only for sylius/sylius tests
+     * For instances started with Sylius-Standard < 2.0.4, it'll still be used unless upgrading webpack.config.js
+     * to use the method above getBaseWebpackConfig()
+     */
+    static getWebpackConfig(rootDir) {
         this._prepareWebpackConfig(rootDir);
         // For a ready-to-use Stimulus bridge. Should be used only for sylius/sylius tests
         Encore
