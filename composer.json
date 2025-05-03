@@ -7,7 +7,8 @@
         "ecommerce",
         "store",
         "webshop",
-        "sylius"
+        "sylius",
+        "symfony-ux"
     ],
     "homepage": "https://sylius.com",
     "license": "MIT",

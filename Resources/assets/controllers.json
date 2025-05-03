@@ -1,5 +1,11 @@
 {
   "controllers": {
+    "@sylius/shop-bundle": {
+      "api-login": {
+        "enabled": true,
+        "fetch": "lazy"
+      }
+    },
     "@symfony/ux-autocomplete": {
       "autocomplete": {
         "main": "dist/controller.js",
@@ -9,6 +15,15 @@
         "autoimport": {
           "tom-select/dist/css/tom-select.default.css": false,
           "tom-select/dist/css/tom-select.bootstrap5.css": false
+        }
+      }
+    },
+    "@symfony/ux-live-component": {
+      "live": {
+        "enabled": true,
+        "fetch": "eager",
+        "autoimport": {
+          "@symfony/ux-live-component/dist/live.min.css": true
         }
       }
     }
