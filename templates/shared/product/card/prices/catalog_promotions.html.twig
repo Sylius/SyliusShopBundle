@@ -1,4 +1,0 @@
-{% set variant = hookable_metadata.context.variant %}
-{% set applied_promotions = hookable_metadata.context.applied_promotions %}
-
-{{ component('sylius_shop:catalog_promotions', { variant : variant, applied_promotions: applied_promotions, withDescription: false }) }}
