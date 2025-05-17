@@ -18,7 +18,7 @@ class SyliusShop {
     static getBaseWebpackConfig(rootDir) {
         this._prepareWebpackConfig(rootDir);
         Encore
-            .addEntry('shop-entry', path.resolve(__dirname, 'Resources/assets/entrypoint.js'))
+            .addEntry('shop-entry', path.resolve(__dirname, 'Resources/assets/entrypoint.js'));
 
         const shopConfig = Encore.getWebpackConfig();
 
@@ -62,7 +62,7 @@ class SyliusShop {
             .enableSassLoader((options) => {
                 // eslint-disable-next-line no-param-reassign
                 options.additionalData = `$rootDir: '${rootDir}';`;
-            })
+            });
     }
 }
 
