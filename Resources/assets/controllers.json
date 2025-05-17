@@ -2,7 +2,9 @@
   "controllers": {
     "@sylius/shop-bundle": {
       "api-login": {
+        "main": "controllers/ApiLoginController.js",
         "enabled": true,
+        "webpackMode": "lazy",
         "fetch": "lazy"
       }
     },
