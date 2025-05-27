@@ -66,6 +66,11 @@
             "Sylius\\Bundle\\ShopBundle\\": ""
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Sylius\\Bundle\\ShopBundle\\": "Tests/"
+        }
+    },
     "repositories": [
         {
             "type": "path",

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Sylius\Bundle\ShopBundle\Tests\DependencyInjection;
+namespace Test\Sylius\Bundle\ShopBundle\DependencyInjection;
 
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
 use PHPUnit\Framework\Attributes\Test;
