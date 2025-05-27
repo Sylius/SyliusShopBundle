@@ -29,67 +29,77 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 final class ShopCustomerAccountSubSectionCacheControlSubscriberTest extends TestCase
 {
-    /** @var SectionProviderInterface|MockObject */
-    private MockObject $sectionProviderMock;
+    private SectionProviderInterface&MockObject $sectionProvider;
 
     private ShopCustomerAccountSubSectionCacheControlSubscriber $shopCustomerAccountSubSectionCacheControlSubscriber;
 
     protected function setUp(): void
     {
-        $this->sectionProviderMock = $this->createMock(SectionProviderInterface::class);
-        $this->shopCustomerAccountSubSectionCacheControlSubscriber = new ShopCustomerAccountSubSectionCacheControlSubscriber($this->sectionProviderMock);
+        $this->sectionProvider = $this->createMock(SectionProviderInterface::class);
+
+        $this->shopCustomerAccountSubSectionCacheControlSubscriber = new ShopCustomerAccountSubSectionCacheControlSubscriber($this->sectionProvider);
     }
 
     public function testSubscribesToKernelResponseEvent(): void
     {
-        $this->assertSame([KernelEvents::RESPONSE => 'setCacheControlDirectives'], $this->shopCustomerAccountSubSectionCacheControlSubscriber::getSubscribedEvents());
+        $this->assertSame(
+            [KernelEvents::RESPONSE => 'setCacheControlDirectives'],
+            $this->shopCustomerAccountSubSectionCacheControlSubscriber::getSubscribedEvents(),
+        );
     }
 
     public function testAddsCacheControlDirectivesToCustomerAccountRequests(): void
     {
-        /** @var HttpKernelInterface|MockObject MockObject $kernelMock */
-        $kernelMock = $this->createMock(HttpKernelInterface::class);
-        /** @var Request|MockObject MockObject $requestMock */
-        $requestMock = $this->createMock(Request::class);
-        /** @var Response|MockObject MockObject $responseMock */
-        $responseMock = $this->createMock(Response::class);
-        /** @var ResponseHeaderBag|MockObject MockObject $responseHeaderBagMock */
-        $responseHeaderBagMock = $this->createMock(ResponseHeaderBag::class);
-        /** @var ShopCustomerAccountSubSection|MockObject MockObject $customerAccountSubSectionMock */
-        $customerAccountSubSectionMock = $this->createMock(ShopCustomerAccountSubSection::class);
-        $this->sectionProviderMock->expects($this->once())->method('getSection')->willReturn($customerAccountSubSectionMock);
-        $responseMock->headers = $responseHeaderBagMock;
+        /** @var HttpKernelInterface&MockObject $kernel */
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        /** @var Request&MockObject $request */
+        $request = $this->createMock(Request::class);
+        /** @var Response&MockObject $response */
+        $response = $this->createMock(Response::class);
+        /** @var ResponseHeaderBag&MockObject $responseHeaderBag */
+        $responseHeaderBag = $this->createMock(ResponseHeaderBag::class);
+        /** @var ShopCustomerAccountSubSection&MockObject $customerAccountSubSection */
+        $customerAccountSubSection = $this->createMock(ShopCustomerAccountSubSection::class);
+
+        $this->sectionProvider->expects($this->once())->method('getSection')->willReturn($customerAccountSubSection);
+        $response->headers = $responseHeaderBag;
         $event = new ResponseEvent(
-            $kernelMock,
-            $requestMock,
+            $kernel,
+            $request,
             KernelInterface::MAIN_REQUEST,
-            $responseMock,
+            $response,
         );
-        $responseHeaderBagMock->expects($this->exactly(4))->method('addCacheControlDirective')->willReturnMap([['no-cache', true], ['max-age', '0'], ['must-revalidate', true], ['no-store', true]]);
+        $responseHeaderBag
+            ->expects($this->exactly(4))
+            ->method('addCacheControlDirective')
+            ->willReturnMap([['no-cache', true], ['max-age', '0'], ['must-revalidate', true], ['no-store', true]])
+        ;
+
         $this->shopCustomerAccountSubSectionCacheControlSubscriber->setCacheControlDirectives($event);
     }
 
     public function testDoesNothingIfSectionIsDifferentThanCustomerAccount(): void
     {
-        /** @var HttpKernelInterface|MockObject MockObject $kernelMock */
-        $kernelMock = $this->createMock(HttpKernelInterface::class);
-        /** @var Request|MockObject MockObject $requestMock */
-        $requestMock = $this->createMock(Request::class);
-        /** @var Response|MockObject MockObject $responseMock */
-        $responseMock = $this->createMock(Response::class);
-        /** @var ResponseHeaderBag|MockObject MockObject $responseHeaderBagMock */
-        $responseHeaderBagMock = $this->createMock(ResponseHeaderBag::class);
-        /** @var SectionInterface|MockObject MockObject $sectionMock */
-        $sectionMock = $this->createMock(SectionInterface::class);
-        $this->sectionProviderMock->expects($this->once())->method('getSection')->willReturn($sectionMock);
-        $responseMock->headers = $responseHeaderBagMock;
+        /** @var HttpKernelInterface&MockObject $kernel */
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        /** @var Request&MockObject $request */
+        $request = $this->createMock(Request::class);
+        /** @var Response&MockObject $response */
+        $response = $this->createMock(Response::class);
+        /** @var ResponseHeaderBag&MockObject $responseHeaderBag */
+        $responseHeaderBag = $this->createMock(ResponseHeaderBag::class);
+        /** @var SectionInterface&MockObject $section */
+        $section = $this->createMock(SectionInterface::class);
+        $this->sectionProvider->expects($this->once())->method('getSection')->willReturn($section);
+        $response->headers = $responseHeaderBag;
         $event = new ResponseEvent(
-            $kernelMock,
-            $requestMock,
+            $kernel,
+            $request,
             KernelInterface::MAIN_REQUEST,
-            $responseMock,
+            $response,
         );
-        $responseHeaderBagMock->expects($this->never())->method('addCacheControlDirective');
+        $responseHeaderBag->expects($this->never())->method('addCacheControlDirective');
+
         $this->shopCustomerAccountSubSectionCacheControlSubscriber->setCacheControlDirectives($event);
     }
 }

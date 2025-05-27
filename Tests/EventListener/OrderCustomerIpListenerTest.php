@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Bundle\ShopBundle\EventListener;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Sylius\Bundle\CoreBundle\Assigner\IpAssignerInterface;
 use Sylius\Bundle\ShopBundle\EventListener\OrderCustomerIpListener;
 use Sylius\Component\Core\Model\OrderInterface;
@@ -26,57 +24,61 @@ use Symfony\Component\Workflow\Event\Event;
 
 final class OrderCustomerIpListenerTest extends TestCase
 {
-    /** @var IpAssignerInterface|MockObject */
-    private MockObject $ipAssignerMock;
+    private IpAssignerInterface&MockObject $ipAssigner;
 
-    /** @var RequestStack|MockObject */
-    private MockObject $requestStackMock;
+    private RequestStack&MockObject $requestStack;
 
     private OrderCustomerIpListener $orderCustomerIpListener;
 
     protected function setUp(): void
     {
-        $this->ipAssignerMock = $this->createMock(IpAssignerInterface::class);
-        $this->requestStackMock = $this->createMock(RequestStack::class);
-        $this->orderCustomerIpListener = new OrderCustomerIpListener($this->ipAssignerMock, $this->requestStackMock);
+        $this->ipAssigner = $this->createMock(IpAssignerInterface::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
+
+        $this->orderCustomerIpListener = new OrderCustomerIpListener($this->ipAssigner, $this->requestStack);
     }
 
     public function testUsesAssignerToAssignCustomerIpToOrder(): void
     {
-        /** @var Event|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(Event::class);
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        /** @var Request|MockObject MockObject $requestMock */
-        $requestMock = $this->createMock(Request::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($orderMock);
-        $this->requestStackMock->expects($this->once())->method('getMainRequest')->willReturn($requestMock);
-        $this->ipAssignerMock->expects($this->once())->method('assign')->with($orderMock, $requestMock);
-        ($this->orderCustomerIpListener)($eventMock);
+        /** @var Event&MockObject $event */
+        $event = $this->createMock(Event::class);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+        /** @var Request&MockObject $request */
+        $request = $this->createMock(Request::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn($order);
+        $this->requestStack->expects($this->once())->method('getMainRequest')->willReturn($request);
+        $this->ipAssigner->expects($this->once())->method('assign')->with($order, $request);
+
+        ($this->orderCustomerIpListener)($event);
     }
 
     public function testThrowsExceptionIfEventSubjectIsNotOrder(): void
     {
-        /** @var Event|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(Event::class);
-        /** @var stdClass|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(stdClass::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($orderMock);
-        $this->expectException(InvalidArgumentException::class);
-        ($this->orderCustomerIpListener)($eventMock);
+        /** @var Event&MockObject $event */
+        $event = $this->createMock(Event::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn(new \stdClass());
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        ($this->orderCustomerIpListener)($event);
     }
 
     public function testDoesNothingIfRequestIsNotAvailable(): void
     {
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        /** @var Event|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(Event::class);
-        /** @var Request|MockObject MockObject $requestMock */
-        $requestMock = $this->createMock(Request::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($orderMock);
-        $this->requestStackMock->expects($this->once())->method('getMainRequest')->willReturn(null);
-        $this->ipAssignerMock->expects($this->never())->method('assign')->with($orderMock, $requestMock);
-        ($this->orderCustomerIpListener)($eventMock);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+        /** @var Event&MockObject $event */
+        $event = $this->createMock(Event::class);
+        /** @var Request&MockObject $request */
+        $request = $this->createMock(Request::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn($order);
+        $this->requestStack->expects($this->once())->method('getMainRequest')->willReturn(null);
+        $this->ipAssigner->expects($this->never())->method('assign')->with($order, $request);
+
+        ($this->orderCustomerIpListener)($event);
     }
 }

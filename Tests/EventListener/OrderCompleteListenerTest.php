@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Bundle\ShopBundle\EventListener;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Sylius\Bundle\CoreBundle\Mailer\OrderEmailManagerInterface;
 use Sylius\Bundle\ShopBundle\EventListener\OrderCompleteListener;
 use Sylius\Component\Core\Model\OrderInterface;
@@ -24,36 +22,38 @@ use Symfony\Component\EventDispatcher\GenericEvent;
 
 final class OrderCompleteListenerTest extends TestCase
 {
-    /** @var OrderEmailManagerInterface|MockObject */
-    private MockObject $orderEmailManagerMock;
+    private OrderEmailManagerInterface&MockObject $orderEmailManager;
 
     private OrderCompleteListener $orderCompleteListener;
 
     protected function setUp(): void
     {
-        $this->orderEmailManagerMock = $this->createMock(OrderEmailManagerInterface::class);
-        $this->orderCompleteListener = new OrderCompleteListener($this->orderEmailManagerMock);
+        $this->orderEmailManager = $this->createMock(OrderEmailManagerInterface::class);
+
+        $this->orderCompleteListener = new OrderCompleteListener($this->orderEmailManager);
     }
 
     public function testSendsAConfirmationEmail(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($orderMock);
-        $this->orderEmailManagerMock->expects($this->once())->method('sendConfirmationEmail')->with($orderMock);
-        $this->orderCompleteListener->sendConfirmationEmail($eventMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn($order);
+        $this->orderEmailManager->expects($this->once())->method('sendConfirmationEmail')->with($order);
+        $this->orderCompleteListener->sendConfirmationEmail($event);
     }
 
     public function testThrowsAnInvalidArgumentExceptionIfAnEventSubjectIsNotAnOrderInstance(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var stdClass|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(stdClass::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($orderMock);
-        $this->expectException(InvalidArgumentException::class);
-        $this->orderCompleteListener->sendConfirmationEmail($eventMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn(new \stdClass());
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->orderCompleteListener->sendConfirmationEmail($event);
     }
 }

@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Bundle\ShopBundle\EventListener;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Sylius\Bundle\ShopBundle\EventListener\OrderLocaleAssigner;
 use Sylius\Component\Core\Model\OrderInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
@@ -24,35 +22,40 @@ use Sylius\Resource\Symfony\EventDispatcher\GenericEvent;
 
 final class OrderLocaleAssignerTest extends TestCase
 {
-    /** @var LocaleContextInterface|MockObject */
-    private MockObject $localeContextMock;
+    private LocaleContextInterface&MockObject $localeContext;
 
     private OrderLocaleAssigner $orderLocaleAssigner;
 
     protected function setUp(): void
     {
-        $this->localeContextMock = $this->createMock(LocaleContextInterface::class);
-        $this->orderLocaleAssigner = new OrderLocaleAssigner($this->localeContextMock);
+        $this->localeContext = $this->createMock(LocaleContextInterface::class);
+
+        $this->orderLocaleAssigner = new OrderLocaleAssigner($this->localeContext);
     }
 
     public function testAssignsLocaleToAnOrder(): void
     {
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($orderMock);
-        $this->localeContextMock->expects($this->once())->method('getLocaleCode')->willReturn('pl_PL');
-        $orderMock->expects($this->once())->method('setLocaleCode')->with('pl_PL');
-        $this->orderLocaleAssigner->assignLocale($eventMock);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn($order);
+        $this->localeContext->expects($this->once())->method('getLocaleCode')->willReturn('pl_PL');
+        $order->expects($this->once())->method('setLocaleCode')->with('pl_PL');
+
+        $this->orderLocaleAssigner->assignLocale($event);
     }
 
     public function testThrowsInvalidArgumentExceptionIfSubjectItNotOrder(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn(new stdClass());
-        $this->expectException(InvalidArgumentException::class);
-        $this->orderLocaleAssigner->assignLocale($eventMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn(new \stdClass());
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->orderLocaleAssigner->assignLocale($event);
     }
 }

@@ -23,29 +23,30 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 final class ShopUserLogoutHandlerTest extends TestCase
 {
-    /** @var ChannelContextInterface|MockObject */
-    private MockObject $channelContextMock;
+    private ChannelContextInterface&MockObject $channelContext;
 
-    /** @var CartStorageInterface|MockObject */
-    private MockObject $cartStorageMock;
+    private CartStorageInterface&MockObject $cartStorage;
 
     private ShopUserLogoutHandler $shopUserLogoutHandler;
 
     protected function setUp(): void
     {
-        $this->channelContextMock = $this->createMock(ChannelContextInterface::class);
-        $this->cartStorageMock = $this->createMock(CartStorageInterface::class);
-        $this->shopUserLogoutHandler = new ShopUserLogoutHandler($this->channelContextMock, $this->cartStorageMock);
+        $this->channelContext = $this->createMock(ChannelContextInterface::class);
+        $this->cartStorage = $this->createMock(CartStorageInterface::class);
+
+        $this->shopUserLogoutHandler = new ShopUserLogoutHandler($this->channelContext, $this->cartStorage);
     }
 
     public function testClearsCartSessionAfterLoggingOut(): void
     {
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        /** @var LogoutEvent|MockObject MockObject $logoutEventMock */
-        $logoutEventMock = $this->createMock(LogoutEvent::class);
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $this->cartStorageMock->expects($this->once())->method('removeForChannel')->with($channelMock);
-        $this->shopUserLogoutHandler->onLogout($logoutEventMock);
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+        /** @var LogoutEvent&MockObject $logoutEvent */
+        $logoutEvent = $this->createMock(LogoutEvent::class);
+
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $this->cartStorage->expects($this->once())->method('removeForChannel')->with($channel);
+
+        $this->shopUserLogoutHandler->onLogout($logoutEvent);
     }
 }

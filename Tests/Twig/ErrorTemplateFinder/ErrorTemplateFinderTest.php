@@ -25,11 +25,9 @@ use Twig\Loader\LoaderInterface;
 
 final class ErrorTemplateFinderTest extends TestCase
 {
-    /** @var SectionProviderInterface|MockObject */
-    private MockObject $sectionProviderMock;
+    private SectionProviderInterface&MockObject $sectionProvider;
 
-    /** @var Environment|MockObject */
-    private MockObject $twigMock;
+    private Environment&MockObject $twig;
 
     private ErrorTemplateFinder $errorTemplateFinder;
 
@@ -37,9 +35,10 @@ final class ErrorTemplateFinderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->sectionProviderMock = $this->createMock(SectionProviderInterface::class);
-        $this->twigMock = $this->createMock(Environment::class);
-        $this->errorTemplateFinder = new ErrorTemplateFinder($this->sectionProviderMock, $this->twigMock);
+        $this->sectionProvider = $this->createMock(SectionProviderInterface::class);
+        $this->twig = $this->createMock(Environment::class);
+
+        $this->errorTemplateFinder = new ErrorTemplateFinder($this->sectionProvider, $this->twig);
     }
 
     public function testImplementsErrorTemplateFinderInterface(): void
@@ -49,45 +48,53 @@ final class ErrorTemplateFinderTest extends TestCase
 
     public function testDoesNotFindTemplateForOtherSectionsThanShop(): void
     {
-        /** @var SectionInterface|MockObject MockObject $sectionMock */
-        $sectionMock = $this->createMock(SectionInterface::class);
-        $this->sectionProviderMock->expects($this->once())->method('getSection')->willReturn($sectionMock);
-        $this->twigMock->expects($this->never())->method('getLoader');
+        /** @var SectionInterface&MockObject $section */
+        $section = $this->createMock(SectionInterface::class);
+
+        $this->sectionProvider->expects($this->once())->method('getSection')->willReturn($section);
+        $this->twig->expects($this->never())->method('getLoader');
+
         $this->assertNull($this->errorTemplateFinder->findTemplate(404));
     }
 
     public function testFindsTemplateForShop(): void
     {
-        /** @var LoaderInterface|MockObject MockObject $loaderMock */
-        $loaderMock = $this->createMock(LoaderInterface::class);
+        /** @var LoaderInterface&MockObject $loader */
+        $loader = $this->createMock(LoaderInterface::class);
+
         $templateName = self::TEMPLATE_PREFIX . '/error404.html.twig';
-        $this->sectionProviderMock->expects($this->once())->method('getSection')->willReturn(new ShopSection());
-        $this->twigMock->expects($this->once())->method('getLoader')->willReturn($loaderMock);
-        $loaderMock->expects($this->once())->method('exists')->with($templateName)->willReturn(true);
+        $this->sectionProvider->expects($this->once())->method('getSection')->willReturn(new ShopSection());
+        $this->twig->expects($this->once())->method('getLoader')->willReturn($loader);
+        $loader->expects($this->once())->method('exists')->with($templateName)->willReturn(true);
+
         $this->assertSame($templateName, $this->errorTemplateFinder->findTemplate(404));
     }
 
     public function testReturnsNullIfNeitherTemplateCanBeFound(): void
     {
-        /** @var LoaderInterface|MockObject MockObject $loaderMock */
-        $loaderMock = $this->createMock(LoaderInterface::class);
+        /** @var LoaderInterface&MockObject $loader */
+        $loader = $this->createMock(LoaderInterface::class);
+
         $templateName = self::TEMPLATE_PREFIX . '/error404.html.twig';
         $fallbackTemplateName = self::TEMPLATE_PREFIX . '/error.html.twig';
-        $this->sectionProviderMock->expects($this->once())->method('getSection')->willReturn(new ShopSection());
-        $this->twigMock->expects($this->once())->method('getLoader')->willReturn($loaderMock);
-        $loaderMock->expects($this->exactly(2))->method('exists')->willReturnMap([[$templateName, false], [$fallbackTemplateName, false]]);
+        $this->sectionProvider->expects($this->once())->method('getSection')->willReturn(new ShopSection());
+        $this->twig->expects($this->once())->method('getLoader')->willReturn($loader);
+        $loader->expects($this->exactly(2))->method('exists')->willReturnMap([[$templateName, false], [$fallbackTemplateName, false]]);
+
         $this->assertNull($this->errorTemplateFinder->findTemplate(404));
     }
 
     public function testFindsFallbackTemplateForShop(): void
     {
-        /** @var LoaderInterface|MockObject MockObject $loaderMock */
-        $loaderMock = $this->createMock(LoaderInterface::class);
+        /** @var LoaderInterface&MockObject $loader */
+        $loader = $this->createMock(LoaderInterface::class);
+
         $templateName = self::TEMPLATE_PREFIX . '/error404.html.twig';
         $fallbackTemplateName = self::TEMPLATE_PREFIX . '/error.html.twig';
-        $this->sectionProviderMock->expects($this->once())->method('getSection')->willReturn(new ShopSection());
-        $this->twigMock->expects($this->once())->method('getLoader')->willReturn($loaderMock);
-        $loaderMock->expects($this->exactly(2))->method('exists')->willReturnMap([[$templateName, false], [$fallbackTemplateName, true]]);
+        $this->sectionProvider->expects($this->once())->method('getSection')->willReturn(new ShopSection());
+        $this->twig->expects($this->once())->method('getLoader')->willReturn($loader);
+        $loader->expects($this->exactly(2))->method('exists')->willReturnMap([[$templateName, false], [$fallbackTemplateName, true]]);
+
         $this->assertSame($fallbackTemplateName, $this->errorTemplateFinder->findTemplate(404));
     }
 }

@@ -24,116 +24,121 @@ use Twig\Extension\AbstractExtension;
 
 final class OrderPaymentsExtensionTest extends TestCase
 {
-    /** @var PaymentMethodsResolverInterface|MockObject */
-    private MockObject $paymentMethodsResolverMock;
+    private PaymentMethodsResolverInterface&MockObject $paymentMethodsResolver;
 
     private OrderPaymentsExtension $orderPaymentsExtension;
 
     protected function setUp(): void
     {
-        $this->paymentMethodsResolverMock = $this->createMock(PaymentMethodsResolverInterface::class);
-        $this->orderPaymentsExtension = new OrderPaymentsExtension($this->paymentMethodsResolverMock);
+        $this->paymentMethodsResolver = $this->createMock(PaymentMethodsResolverInterface::class);
+
+        $this->orderPaymentsExtension = new OrderPaymentsExtension($this->paymentMethodsResolver);
     }
 
-    public function testATwigExtension(): void
+    public function testTwigExtension(): void
     {
         $this->assertInstanceOf(AbstractExtension::class, $this->orderPaymentsExtension);
     }
 
     public function testReturnsFalseIfOrderHasNoNewPayments(): void
     {
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        $orderMock->expects($this->once())->method('getPayments')->willReturn(new ArrayCollection());
-        $this->assertFalse($this->orderPaymentsExtension->allNewPaymentsCanBePaid($orderMock));
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+
+        $order->expects($this->once())->method('getPayments')->willReturn(new ArrayCollection());
+
+        $this->assertFalse($this->orderPaymentsExtension->allNewPaymentsCanBePaid($order));
     }
 
     public function testReturnsFalseWhenAllNewPaymentsHaveNoSupportedMethods(): void
     {
-        /** @var PaymentInterface|MockObject MockObject $firstPaymentMock */
-        $firstPaymentMock = $this->createMock(PaymentInterface::class);
-        /** @var PaymentInterface|MockObject MockObject $secondPaymentMock */
-        $secondPaymentMock = $this->createMock(PaymentInterface::class);
-        /** @var PaymentInterface|MockObject MockObject $thirdPaymentMock */
-        $thirdPaymentMock = $this->createMock(PaymentInterface::class);
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        $firstPaymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
-        $secondPaymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_CANCELLED);
-        $thirdPaymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
-        $orderMock->expects($this->once())->method('getPayments')->willReturn(new ArrayCollection([
-            $firstPaymentMock,
-            $secondPaymentMock,
-            $thirdPaymentMock,
+        /** @var PaymentInterface&MockObject $firstPayment */
+        $firstPayment = $this->createMock(PaymentInterface::class);
+        /** @var PaymentInterface&MockObject $secondPayment */
+        $secondPayment = $this->createMock(PaymentInterface::class);
+        /** @var PaymentInterface&MockObject $thirdPayment */
+        $thirdPayment = $this->createMock(PaymentInterface::class);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+
+        $firstPayment->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
+        $secondPayment->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_CANCELLED);
+        $thirdPayment->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
+        $order->expects($this->once())->method('getPayments')->willReturn(new ArrayCollection([
+            $firstPayment,
+            $secondPayment,
+            $thirdPayment,
         ]));
 
-        $this->paymentMethodsResolverMock
+        $this->paymentMethodsResolver
             ->method('getSupportedMethods')
             ->willReturnMap([
-                [$firstPaymentMock, []],
-                [$thirdPaymentMock, []],
+                [$firstPayment, []],
+                [$thirdPayment, []],
             ])
         ;
 
-        $this->assertFalse($this->orderPaymentsExtension->allNewPaymentsCanBePaid($orderMock));
+        $this->assertFalse($this->orderPaymentsExtension->allNewPaymentsCanBePaid($order));
     }
 
     public function testReturnsFalseWhenAtLeastOneNewPaymentHasNoSupportedMethods(): void
     {
-        /** @var PaymentInterface|MockObject MockObject $firstPaymentMock */
-        $firstPaymentMock = $this->createMock(PaymentInterface::class);
-        /** @var PaymentInterface|MockObject MockObject $secondPaymentMock */
-        $secondPaymentMock = $this->createMock(PaymentInterface::class);
-        /** @var PaymentInterface|MockObject MockObject $thirdPaymentMock */
-        $thirdPaymentMock = $this->createMock(PaymentInterface::class);
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        $firstPaymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
-        $secondPaymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_CANCELLED);
-        $thirdPaymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
-        $orderMock->expects($this->once())->method('getPayments')->willReturn(new ArrayCollection([
-            $firstPaymentMock,
-            $secondPaymentMock,
-            $thirdPaymentMock,
+        /** @var PaymentInterface&MockObject $firstPayment */
+        $firstPayment = $this->createMock(PaymentInterface::class);
+        /** @var PaymentInterface&MockObject $secondPayment */
+        $secondPayment = $this->createMock(PaymentInterface::class);
+        /** @var PaymentInterface&MockObject $thirdPayment */
+        $thirdPayment = $this->createMock(PaymentInterface::class);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+
+        $firstPayment->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
+        $secondPayment->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_CANCELLED);
+        $thirdPayment->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
+        $order->expects($this->once())->method('getPayments')->willReturn(new ArrayCollection([
+            $firstPayment,
+            $secondPayment,
+            $thirdPayment,
         ]));
 
-        $this->paymentMethodsResolverMock
+        $this->paymentMethodsResolver
             ->method('getSupportedMethods')
             ->willReturnMap([
-                [$firstPaymentMock, ['method']],
-                [$thirdPaymentMock, []],
+                [$firstPayment, ['method']],
+                [$thirdPayment, []],
             ])
         ;
 
-        $this->assertFalse($this->orderPaymentsExtension->allNewPaymentsCanBePaid($orderMock));
+        $this->assertFalse($this->orderPaymentsExtension->allNewPaymentsCanBePaid($order));
     }
 
     public function testReturnsTrueWhenAllNewPaymentsHaveAtLeastOneSupportedMethod(): void
     {
-        /** @var PaymentInterface|MockObject MockObject $firstPaymentMock */
-        $firstPaymentMock = $this->createMock(PaymentInterface::class);
-        /** @var PaymentInterface|MockObject MockObject $secondPaymentMock */
-        $secondPaymentMock = $this->createMock(PaymentInterface::class);
-        /** @var PaymentInterface|MockObject MockObject $thirdPaymentMock */
-        $thirdPaymentMock = $this->createMock(PaymentInterface::class);
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        $firstPaymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
-        $secondPaymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_CANCELLED);
-        $thirdPaymentMock->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
-        $orderMock->expects($this->once())->method('getPayments')->willReturn(new ArrayCollection([
-            $firstPaymentMock,
-            $secondPaymentMock,
-            $thirdPaymentMock,
+        /** @var PaymentInterface&MockObject $firstPayment */
+        $firstPayment = $this->createMock(PaymentInterface::class);
+        /** @var PaymentInterface&MockObject $secondPayment */
+        $secondPayment = $this->createMock(PaymentInterface::class);
+        /** @var PaymentInterface&MockObject $thirdPayment */
+        $thirdPayment = $this->createMock(PaymentInterface::class);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+
+        $firstPayment->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
+        $secondPayment->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_CANCELLED);
+        $thirdPayment->expects($this->once())->method('getState')->willReturn(PaymentInterface::STATE_NEW);
+        $order->expects($this->once())->method('getPayments')->willReturn(new ArrayCollection([
+            $firstPayment,
+            $secondPayment,
+            $thirdPayment,
         ]));
 
-        $this->paymentMethodsResolverMock
+        $this->paymentMethodsResolver
             ->method('getSupportedMethods')
             ->willReturnMap([
-                [$firstPaymentMock, ['method', 'another_method']],
-                [$thirdPaymentMock, ['method']],
+                [$firstPayment, ['method', 'another_method']],
+                [$thirdPayment, ['method']],
             ])
         ;
-        $this->assertTrue($this->orderPaymentsExtension->allNewPaymentsCanBePaid($orderMock));
+        $this->assertTrue($this->orderPaymentsExtension->allNewPaymentsCanBePaid($order));
     }
 }

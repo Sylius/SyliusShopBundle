@@ -28,70 +28,78 @@ use Sylius\Component\User\Model\UserInterface;
 
 final class UserImpersonatedListenerTest extends TestCase
 {
-    /** @var CartStorageInterface|MockObject */
-    private MockObject $cartStorageMock;
+    private CartStorageInterface&MockObject $cartStorage;
 
-    /** @var ChannelContextInterface|MockObject */
-    private MockObject $channelContextMock;
+    private ChannelContextInterface&MockObject $channelContext;
 
-    /** @var OrderRepositoryInterface|MockObject */
-    private MockObject $orderRepositoryMock;
+    private OrderRepositoryInterface&MockObject $orderRepository;
 
     private UserImpersonatedListener $userImpersonatedListener;
 
     protected function setUp(): void
     {
-        $this->cartStorageMock = $this->createMock(CartStorageInterface::class);
-        $this->channelContextMock = $this->createMock(ChannelContextInterface::class);
-        $this->orderRepositoryMock = $this->createMock(OrderRepositoryInterface::class);
-        $this->userImpersonatedListener = new UserImpersonatedListener($this->cartStorageMock, $this->channelContextMock, $this->orderRepositoryMock);
+        $this->cartStorage = $this->createMock(CartStorageInterface::class);
+        $this->channelContext = $this->createMock(ChannelContextInterface::class);
+        $this->orderRepository = $this->createMock(OrderRepositoryInterface::class);
+
+        $this->userImpersonatedListener = new UserImpersonatedListener(
+            $this->cartStorage,
+            $this->channelContext,
+            $this->orderRepository,
+        );
     }
 
     public function testSetsCartIdOfAnImpersonatedCustomerInSession(): void
     {
-        /** @var UserEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(UserEvent::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        /** @var OrderInterface|MockObject MockObject $cartMock */
-        $cartMock = $this->createMock(OrderInterface::class);
-        $eventMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $userMock->expects($this->once())->method('getCustomer')->willReturn($customerMock);
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $this->orderRepositoryMock->expects($this->once())->method('findLatestCartByChannelAndCustomer')->with($channelMock, $customerMock)->willReturn($cartMock);
-        $this->cartStorageMock->expects($this->once())->method('setForChannel')->with($channelMock, $cartMock);
-        $this->userImpersonatedListener->onUserImpersonated($eventMock);
+        /** @var UserEvent&MockObject $event */
+        $event = $this->createMock(UserEvent::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+        /** @var OrderInterface&MockObject $cart */
+        $cart = $this->createMock(OrderInterface::class);
+
+        $event->expects($this->once())->method('getUser')->willReturn($user);
+        $user->expects($this->once())->method('getCustomer')->willReturn($customer);
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $this->orderRepository->expects($this->once())->method('findLatestCartByChannelAndCustomer')->with($channel, $customer)->willReturn($cart);
+        $this->cartStorage->expects($this->once())->method('setForChannel')->with($channel, $cart);
+
+        $this->userImpersonatedListener->onUserImpersonated($event);
     }
 
     public function testRemovesTheCurrentCartIdIfAnImpersonatedCustomerHasNoCart(): void
     {
-        /** @var UserEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(UserEvent::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        $eventMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $userMock->expects($this->once())->method('getCustomer')->willReturn($customerMock);
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $this->orderRepositoryMock->expects($this->once())->method('findLatestCartByChannelAndCustomer')->with($channelMock, $customerMock)->willReturn(null);
-        $this->cartStorageMock->expects($this->once())->method('removeForChannel')->with($channelMock);
-        $this->userImpersonatedListener->onUserImpersonated($eventMock);
+        /** @var UserEvent&MockObject $event */
+        $event = $this->createMock(UserEvent::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+
+        $event->expects($this->once())->method('getUser')->willReturn($user);
+        $user->expects($this->once())->method('getCustomer')->willReturn($customer);
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $this->orderRepository->expects($this->once())->method('findLatestCartByChannelAndCustomer')->with($channel, $customer)->willReturn(null);
+        $this->cartStorage->expects($this->once())->method('removeForChannel')->with($channel);
+
+        $this->userImpersonatedListener->onUserImpersonated($event);
     }
 
     public function testDoesNothingWhenTheUserIsNotAShopUserType(): void
     {
-        /** @var UserEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(UserEvent::class);
-        /** @var UserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(UserInterface::class);
-        $eventMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $this->userImpersonatedListener->onUserImpersonated($eventMock);
+        /** @var UserEvent&MockObject $event */
+        $event = $this->createMock(UserEvent::class);
+        /** @var UserInterface&MockObject $user */
+        $user = $this->createMock(UserInterface::class);
+
+        $event->expects($this->once())->method('getUser')->willReturn($user);
+
+        $this->userImpersonatedListener->onUserImpersonated($event);
     }
 }

@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Bundle\ShopBundle\EventListener;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Sylius\Bundle\OrderBundle\Controller\AddToCartCommandInterface;
 use Sylius\Bundle\ShopBundle\EventListener\CartItemAddListener;
 use Sylius\Component\Core\Model\OrderInterface;
@@ -26,42 +24,45 @@ use Symfony\Component\EventDispatcher\GenericEvent;
 
 final class CartItemAddListenerTest extends TestCase
 {
-    /** @var OrderModifierInterface|MockObject */
-    private MockObject $orderModifierMock;
+    private OrderModifierInterface&MockObject $orderModifier;
 
     private CartItemAddListener $cartItemAddListener;
 
     protected function setUp(): void
     {
-        $this->orderModifierMock = $this->createMock(OrderModifierInterface::class);
-        $this->cartItemAddListener = new CartItemAddListener($this->orderModifierMock);
+        $this->orderModifier = $this->createMock(OrderModifierInterface::class);
+
+        $this->cartItemAddListener = new CartItemAddListener($this->orderModifier);
     }
 
     public function testAddsCartItemToOrder(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var AddToCartCommandInterface|MockObject MockObject $addToCartCommandMock */
-        $addToCartCommandMock = $this->createMock(AddToCartCommandInterface::class);
-        /** @var OrderItemInterface|MockObject MockObject $orderItemMock */
-        $orderItemMock = $this->createMock(OrderItemInterface::class);
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        $addToCartCommandMock->expects($this->once())->method('getCart')->willReturn($orderMock);
-        $addToCartCommandMock->expects($this->once())->method('getCartItem')->willReturn($orderItemMock);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($addToCartCommandMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var AddToCartCommandInterface&MockObject $addToCartCommand */
+        $addToCartCommand = $this->createMock(AddToCartCommandInterface::class);
+        /** @var OrderItemInterface&MockObject $orderItem */
+        $orderItem = $this->createMock(OrderItemInterface::class);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
 
-        $this->orderModifierMock->expects($this->once())->method('addToOrder')->with($orderMock, $orderItemMock);
+        $addToCartCommand->expects($this->once())->method('getCart')->willReturn($order);
+        $addToCartCommand->expects($this->once())->method('getCartItem')->willReturn($orderItem);
+        $event->expects($this->once())->method('getSubject')->willReturn($addToCartCommand);
+        $this->orderModifier->expects($this->once())->method('addToOrder')->with($order, $orderItem);
 
-        $this->cartItemAddListener->addToOrder($eventMock);
+        $this->cartItemAddListener->addToOrder($event);
     }
 
     public function testThrowsExceptionIfEventSubjectIsNotAddToCartCommand(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn(new stdClass());
-        $this->expectException(InvalidArgumentException::class);
-        $this->cartItemAddListener->addToOrder($eventMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn(new \stdClass());
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->cartItemAddListener->addToOrder($event);
     }
 }

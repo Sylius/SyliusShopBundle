@@ -27,38 +27,44 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class NonChannelLocaleListenerTest extends TestCase
 {
-    /** @var RouterInterface|MockObject */
-    private $router;
+    private RouterInterface&MockObject $router;
 
-    /** @var LocaleProviderInterface|MockObject */
-    private $localeProvider;
+    private LocaleProviderInterface&MockObject $localeProvider;
 
-    /** @var FirewallMap|MockObject */
-    private $firewallMap;
+    private FirewallMap&MockObject $firewallMap;
 
-    private NonChannelLocaleListener $listener;
+    private NonChannelLocaleListener $nonChannelLocaleListener;
 
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
         $this->localeProvider = $this->createMock(LocaleProviderInterface::class);
         $this->firewallMap = $this->createMock(FirewallMap::class);
+
+        $this->nonChannelLocaleListener = new NonChannelLocaleListener(
+            $this->router,
+            $this->localeProvider,
+            $this->firewallMap,
+            ['shop'],
+        );
     }
 
     public function testItThrowsExceptionOnInstantiationWithNoFirewallNames(): void
     {
         $this->expectException(\InvalidArgumentException::class);
+
         new NonChannelLocaleListener(
             $this->router,
             $this->localeProvider,
             $this->firewallMap,
-            []
+            [],
         );
     }
 
     public function testItThrowsExceptionOnInstantiationWithNonStringFirewallNames(): void
     {
         $this->expectException(\InvalidArgumentException::class);
+
         new NonChannelLocaleListener(
             $this->router,
             $this->localeProvider,
@@ -70,24 +76,13 @@ final class NonChannelLocaleListenerTest extends TestCase
     public function testItDoesNothingIfNotMainRequest(): void
     {
         $event = $this->createMock(RequestEvent::class);
-        $event->expects($this->once())
-            ->method('isMainRequest')
-            ->willReturn(false);
+        $event->expects($this->once())->method('isMainRequest')->willReturn(false);
 
         $event->expects($this->never())->method('getRequest');
         $this->firewallMap->expects($this->never())->method('getFirewallConfig');
         $this->localeProvider->expects($this->never())->method('getAvailableLocalesCodes');
 
-        $this->listener = new NonChannelLocaleListener(
-            $this->router,
-            $this->localeProvider,
-            $this->firewallMap,
-            ['shop']
-        );
-
-        $this->listener->restrictRequestLocale($event);
-
-        $this->assertTrue(true);
+        $this->nonChannelLocaleListener->restrictRequestLocale($event);
     }
 
     public function testItDoesNothingIfRequestBehindNoFirewall(): void
@@ -96,31 +91,13 @@ final class NonChannelLocaleListenerTest extends TestCase
         $request->attributes = new ParameterBag(['_locale' => 'en']);
         $event = $this->createMock(RequestEvent::class);
 
-        $event->expects($this->once())
-            ->method('isMainRequest')
-            ->willReturn(true);
-        $event->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request);
+        $event->expects($this->once())->method('isMainRequest')->willReturn(true);
+        $event->expects($this->once())->method('getRequest')->willReturn($request);
 
-        $this->firewallMap->expects($this->once())
-            ->method('getFirewallConfig')
-            ->with($request)
-            ->willReturn(null);
+        $this->firewallMap->expects($this->once())->method('getFirewallConfig')->with($request)->willReturn(null);
+        $this->localeProvider->expects($this->never())->method('getAvailableLocalesCodes');
 
-        $this->localeProvider->expects($this->never())
-            ->method('getAvailableLocalesCodes');
-
-        $this->listener = new NonChannelLocaleListener(
-            $this->router,
-            $this->localeProvider,
-            $this->firewallMap,
-            ['shop']
-        );
-
-        $this->listener->restrictRequestLocale($event);
-
-        $this->assertTrue(true);
+        $this->nonChannelLocaleListener->restrictRequestLocale($event);
     }
 
     public function testItDoesNothingIfFirewallNotInAllowedList(): void
@@ -129,31 +106,19 @@ final class NonChannelLocaleListenerTest extends TestCase
         $request->attributes = new ParameterBag(['_locale' => 'en']);
         $event = $this->createMock(RequestEvent::class);
 
-        $event->expects($this->once())
-            ->method('isMainRequest')
-            ->willReturn(true);
-        $event->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request);
+        $event->expects($this->once())->method('isMainRequest')->willReturn(true);
+        $event->expects($this->once())->method('getRequest')->willReturn($request);
 
-        $this->firewallMap->expects($this->once())
+        $this->firewallMap
+            ->expects($this->once())
             ->method('getFirewallConfig')
             ->with($request)
-            ->willReturn(new FirewallConfig('lalaland', 'mock'));
+            ->willReturn(new FirewallConfig('lalaland', 'mock'))
+        ;
 
-        $this->localeProvider->expects($this->never())
-            ->method('getAvailableLocalesCodes');
+        $this->localeProvider->expects($this->never())->method('getAvailableLocalesCodes');
 
-        $this->listener = new NonChannelLocaleListener(
-            $this->router,
-            $this->localeProvider,
-            $this->firewallMap,
-            ['shop']
-        );
-
-        $this->listener->restrictRequestLocale($event);
-
-        $this->assertTrue(true);
+        $this->nonChannelLocaleListener->restrictRequestLocale($event);
     }
 
     public function testItDoesNothingIfRequestLocaleIsInProvider(): void
@@ -162,89 +127,62 @@ final class NonChannelLocaleListenerTest extends TestCase
         $request->attributes = new ParameterBag(['_locale' => 'en']);
         $event = $this->createMock(RequestEvent::class);
 
-        $event->expects($this->once())
-            ->method('isMainRequest')
-            ->willReturn(true);
-        $event->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request);
+        $event->expects($this->once())->method('isMainRequest')->willReturn(true);
+        $event->expects($this->once())->method('getRequest')->willReturn($request);
 
         $firewallConfig = new FirewallConfig('shop', 'mock');
-        $this->firewallMap->expects($this->once())
+        $this->firewallMap
+            ->expects($this->once())
             ->method('getFirewallConfig')
             ->with($request)
-            ->willReturn($firewallConfig);
+            ->willReturn($firewallConfig)
+        ;
 
-        $request->expects($this->once())
-            ->method('getLocale')
-            ->willReturn('en');
+        $request->expects($this->once())->method('getLocale')->willReturn('en');
 
-        $this->localeProvider->expects($this->once())
-            ->method('getAvailableLocalesCodes')
-            ->willReturn(['en', 'ga_IE']);
+        $this->localeProvider->expects($this->once())->method('getAvailableLocalesCodes')->willReturn(['en', 'ga_IE']);
 
-        $this->listener = new NonChannelLocaleListener(
-            $this->router,
-            $this->localeProvider,
-            $this->firewallMap,
-            ['shop']
-        );
-
-        $this->listener->restrictRequestLocale($event);
-
-        $this->assertTrue(true);
+        $this->nonChannelLocaleListener->restrictRequestLocale($event);
     }
 
     public function testItRedirectsToDefaultLocaleIfRequestLocaleNotInProvider(): void
     {
         $request = $this->createMock(Request::class);
+        $request->attributes = new ParameterBag(['_locale' => 'en']);
         $event = $this->createMock(RequestEvent::class);
 
-        $event->expects($this->once())
-            ->method('isMainRequest')
-            ->willReturn(true);
-        $event->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request);
+        $event->expects($this->once())->method('isMainRequest')->willReturn(true);
+        $event->expects($this->once())->method('getRequest')->willReturn($request);
 
         $firewallConfig = new FirewallConfig('shop', 'mock');
-        $this->firewallMap->expects($this->once())
+        $this->firewallMap
+            ->expects($this->once())
             ->method('getFirewallConfig')
             ->with($request)
-            ->willReturn($firewallConfig);
+            ->willReturn($firewallConfig)
+        ;
 
-        $request->expects($this->once())
-            ->method('getLocale')
-            ->willReturn('en');
+        $request->expects($this->once())->method('getLocale')->willReturn('en');
 
-        $request->attributes = new ParameterBag(['_locale' => 'en']);
+        $this->localeProvider->expects($this->once())->method('getAvailableLocalesCodes')->willReturn(['ga', 'ga_IE']);
+        $this->localeProvider->expects($this->once())->method('getDefaultLocaleCode')->willReturn('ga');
 
-        $this->localeProvider->expects($this->once())
-            ->method('getAvailableLocalesCodes')
-            ->willReturn(['ga', 'ga_IE']);
-        $this->localeProvider->expects($this->once())
-            ->method('getDefaultLocaleCode')
-            ->willReturn('ga');
-
-        $this->router->expects($this->once())
+        $this->router
+            ->expects($this->once())
             ->method('generate')
             ->with('sylius_shop_homepage', ['_locale' => 'ga'])
-            ->willReturn('/ga/');
+            ->willReturn('/ga/')
+        ;
 
-        $event->expects($this->once())
+        $event
+            ->expects($this->once())
             ->method('setResponse')
             ->with($this->callback(function ($response) {
                 return $response instanceof RedirectResponse && $response->getTargetUrl() === '/ga/';
-            }));
+            }))
+        ;
 
-        $this->listener = new NonChannelLocaleListener(
-            $this->router,
-            $this->localeProvider,
-            $this->firewallMap,
-            ['shop']
-        );
-
-        $this->listener->restrictRequestLocale($event);
+        $this->nonChannelLocaleListener->restrictRequestLocale($event);
     }
 
     public function testItDoesNothingIfRequestAttributesHasNoLocale(): void
@@ -253,24 +191,11 @@ final class NonChannelLocaleListenerTest extends TestCase
         $request->attributes = new ParameterBag();
         $event = $this->createMock(RequestEvent::class);
 
-        $event->expects($this->once())
-            ->method('isMainRequest')
-            ->willReturn(true);
-        $event->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request);
+        $event->expects($this->once())->method('isMainRequest')->willReturn(true);
+        $event->expects($this->once())->method('getRequest')->willReturn($request);
 
-        $request->expects($this->never())
-            ->method('getLocale');
+        $request->expects($this->never())->method('getLocale');
 
-
-        $this->listener = new NonChannelLocaleListener(
-            $this->router,
-            $this->localeProvider,
-            $this->firewallMap,
-            ['shop']
-        );
-
-        $this->listener->restrictRequestLocale($event);
+        $this->nonChannelLocaleListener->restrictRequestLocale($event);
     }
 }

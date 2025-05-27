@@ -32,193 +32,214 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 final class ShopCartBlamerListenerTest extends TestCase
 {
-    /** @var CartContextInterface|MockObject */
-    private MockObject $cartContextMock;
+    private CartContextInterface&MockObject $cartContext;
 
-    /** @var SectionProviderInterface|MockObject */
-    private MockObject $sectionResolverMock;
+    private SectionProviderInterface&MockObject $sectionResolver;
 
     private ShopCartBlamerListener $shopCartBlamerListener;
 
     protected function setUp(): void
     {
-        $this->cartContextMock = $this->createMock(CartContextInterface::class);
-        $this->sectionResolverMock = $this->createMock(SectionProviderInterface::class);
-        $this->shopCartBlamerListener = new ShopCartBlamerListener($this->cartContextMock, $this->sectionResolverMock);
+        $this->cartContext = $this->createMock(CartContextInterface::class);
+        $this->sectionResolver = $this->createMock(SectionProviderInterface::class);
+
+        $this->shopCartBlamerListener = new ShopCartBlamerListener($this->cartContext, $this->sectionResolver);
     }
 
     public function testThrowsAnExceptionWhenCartDoesNotImplementCoreOrderInterfaceOnImplicitLogin(): void
     {
-        /** @var \Sylius\Component\Order\Model\OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(\Sylius\Component\Order\Model\OrderInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var UserEvent|MockObject MockObject $userEventMock */
-        $userEventMock = $this->createMock(UserEvent::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->cartContextMock->expects($this->once())->method('getCart')->willReturn($orderMock);
-        $userEventMock->expects($this->once())->method('getUser')->willReturn($userMock);
+        /** @var \Sylius\Component\Order\Model\OrderInterface&MockObject $order */
+        $order = $this->createMock(\Sylius\Component\Order\Model\OrderInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var UserEvent&MockObject $userEvent */
+        $userEvent = $this->createMock(UserEvent::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->cartContext->expects($this->once())->method('getCart')->willReturn($order);
+        $userEvent->expects($this->once())->method('getUser')->willReturn($user);
+
         $this->expectException(UnexpectedTypeException::class);
-        $this->shopCartBlamerListener->onImplicitLogin($userEventMock);
+
+        $this->shopCartBlamerListener->onImplicitLogin($userEvent);
     }
 
     public function testThrowsAnExceptionWhenCartDoesNotImplementCoreOrderInterfaceOnInteractiveLogin(): void
     {
-        /** @var \Sylius\Component\Order\Model\OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(\Sylius\Component\Order\Model\OrderInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var Request|MockObject MockObject $requestMock */
-        $requestMock = $this->createMock(Request::class);
-        /** @var TokenInterface|MockObject MockObject $tokenMock */
-        $tokenMock = $this->createMock(TokenInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->cartContextMock->expects($this->once())->method('getCart')->willReturn($orderMock);
-        $tokenMock->expects($this->once())->method('getUser')->willReturn($userMock);
+        /** @var \Sylius\Component\Order\Model\OrderInterface&MockObject $order */
+        $order = $this->createMock(\Sylius\Component\Order\Model\OrderInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var Request&MockObject $request */
+        $request = $this->createMock(Request::class);
+        /** @var TokenInterface&MockObject $token */
+        $token = $this->createMock(TokenInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->cartContext->expects($this->once())->method('getCart')->willReturn($order);
+        $token->expects($this->once())->method('getUser')->willReturn($user);
+
         $this->expectException(UnexpectedTypeException::class);
-        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($requestMock, $tokenMock));
+
+        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($request, $token));
     }
 
     public function testBlamesCartOnUserOnImplicitLogin(): void
     {
-        /** @var OrderInterface|MockObject MockObject $cartMock */
-        $cartMock = $this->createMock(OrderInterface::class);
-        /** @var UserEvent|MockObject MockObject $userEventMock */
-        $userEventMock = $this->createMock(UserEvent::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->cartContextMock->expects($this->once())->method('getCart')->willReturn($cartMock);
-        $cartMock->expects($this->once())->method('getCustomer')->willReturn(null);
-        $userEventMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $userMock->expects($this->once())->method('getCustomer')->willReturn($customerMock);
-        $cartMock->expects($this->once())->method('setCustomerWithAuthorization')->with($customerMock);
-        $this->shopCartBlamerListener->onImplicitLogin($userEventMock);
+        /** @var OrderInterface&MockObject $cart */
+        $cart = $this->createMock(OrderInterface::class);
+        /** @var UserEvent&MockObject $userEvent */
+        $userEvent = $this->createMock(UserEvent::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->cartContext->expects($this->once())->method('getCart')->willReturn($cart);
+        $cart->expects($this->once())->method('getCustomer')->willReturn(null);
+        $userEvent->expects($this->once())->method('getUser')->willReturn($user);
+        $user->expects($this->once())->method('getCustomer')->willReturn($customer);
+        $cart->expects($this->once())->method('setCustomerWithAuthorization')->with($customer);
+
+        $this->shopCartBlamerListener->onImplicitLogin($userEvent);
     }
 
     public function testBlamesCartOnUserOnInteractiveLogin(): void
     {
-        /** @var OrderInterface|MockObject MockObject $cartMock */
-        $cartMock = $this->createMock(OrderInterface::class);
-        /** @var Request|MockObject MockObject $requestMock */
-        $requestMock = $this->createMock(Request::class);
-        /** @var TokenInterface|MockObject MockObject $tokenMock */
-        $tokenMock = $this->createMock(TokenInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->cartContextMock->expects($this->once())->method('getCart')->willReturn($cartMock);
-        $cartMock->expects($this->once())->method('getCustomer')->willReturn(null);
-        $tokenMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $userMock->expects($this->once())->method('getCustomer')->willReturn($customerMock);
-        $cartMock->expects($this->once())->method('setCustomerWithAuthorization')->with($customerMock);
-        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($requestMock, $tokenMock));
+        /** @var OrderInterface&MockObject $cart */
+        $cart = $this->createMock(OrderInterface::class);
+        /** @var Request&MockObject $request */
+        $request = $this->createMock(Request::class);
+        /** @var TokenInterface&MockObject $token */
+        $token = $this->createMock(TokenInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->cartContext->expects($this->once())->method('getCart')->willReturn($cart);
+        $cart->expects($this->once())->method('getCustomer')->willReturn(null);
+        $token->expects($this->once())->method('getUser')->willReturn($user);
+        $user->expects($this->once())->method('getCustomer')->willReturn($customer);
+        $cart->expects($this->once())->method('setCustomerWithAuthorization')->with($customer);
+
+        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($request, $token));
     }
 
     public function testDoesNothingIfGivenCartHasBeenBlamedInPast(): void
     {
-        /** @var OrderInterface|MockObject MockObject $cartMock */
-        $cartMock = $this->createMock(OrderInterface::class);
-        /** @var Request|MockObject MockObject $requestMock */
-        $requestMock = $this->createMock(Request::class);
-        /** @var TokenInterface|MockObject MockObject $tokenMock */
-        $tokenMock = $this->createMock(TokenInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->cartContextMock->expects($this->once())->method('getCart')->willReturn($cartMock);
-        $cartMock->expects($this->once())->method('getCustomer')->willReturn($customerMock);
-        $tokenMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $cartMock->expects($this->never())->method('setCustomerWithAuthorization');
-        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($requestMock, $tokenMock));
+        /** @var OrderInterface&MockObject $cart */
+        $cart = $this->createMock(OrderInterface::class);
+        /** @var Request&MockObject $request */
+        $request = $this->createMock(Request::class);
+        /** @var TokenInterface&MockObject $token */
+        $token = $this->createMock(TokenInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->cartContext->expects($this->once())->method('getCart')->willReturn($cart);
+        $cart->expects($this->once())->method('getCustomer')->willReturn($customer);
+        $token->expects($this->once())->method('getUser')->willReturn($user);
+        $cart->expects($this->never())->method('setCustomerWithAuthorization');
+
+        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($request, $token));
     }
 
     public function testDoesNothingIfGivenUserIsInvalidOnInteractiveLogin(): void
     {
-        /** @var OrderInterface|MockObject MockObject $cartMock */
-        $cartMock = $this->createMock(OrderInterface::class);
-        /** @var Request|MockObject MockObject $requestMock */
-        $requestMock = $this->createMock(Request::class);
-        /** @var TokenInterface|MockObject MockObject $tokenMock */
-        $tokenMock = $this->createMock(TokenInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->cartContextMock->expects($this->never())->method('getCart');
-        $tokenMock->expects($this->once())->method('getUser')->willReturn(null);
-        $cartMock->expects($this->never())->method('setCustomerWithAuthorization');
-        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($requestMock, $tokenMock));
+        /** @var OrderInterface&MockObject $cart */
+        $cart = $this->createMock(OrderInterface::class);
+        /** @var Request&MockObject $request */
+        $request = $this->createMock(Request::class);
+        /** @var TokenInterface&MockObject $token */
+        $token = $this->createMock(TokenInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->cartContext->expects($this->never())->method('getCart');
+        $token->expects($this->once())->method('getUser')->willReturn(null);
+        $cart->expects($this->never())->method('setCustomerWithAuthorization');
+
+        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($request, $token));
     }
 
     public function testDoesNothingIfThereIsNoExistingCartOnImplicitLogin(): void
     {
-        /** @var UserEvent|MockObject MockObject $userEventMock */
-        $userEventMock = $this->createMock(UserEvent::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->cartContextMock->expects($this->once())->method('getCart')->willThrowException(new CartNotFoundException());
-        $userEventMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $this->shopCartBlamerListener->onImplicitLogin($userEventMock);
+        /** @var UserEvent&MockObject $userEvent */
+        $userEvent = $this->createMock(UserEvent::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->cartContext->expects($this->once())->method('getCart')->willThrowException(new CartNotFoundException());
+        $userEvent->expects($this->once())->method('getUser')->willReturn($user);
+
+        $this->shopCartBlamerListener->onImplicitLogin($userEvent);
     }
 
     public function testDoesNothingIfThereIsNoExistingCartOnInteractiveLogin(): void
     {
-        /** @var Request|MockObject MockObject $requestMock */
-        $requestMock = $this->createMock(Request::class);
-        /** @var TokenInterface|MockObject MockObject $tokenMock */
-        $tokenMock = $this->createMock(TokenInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->cartContextMock->expects($this->once())->method('getCart')->willThrowException(new CartNotFoundException());
-        $tokenMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($requestMock, $tokenMock));
+        /** @var Request&MockObject $request */
+        $request = $this->createMock(Request::class);
+        /** @var TokenInterface&MockObject $token */
+        $token = $this->createMock(TokenInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->cartContext->expects($this->once())->method('getCart')->willThrowException(new CartNotFoundException());
+        $token->expects($this->once())->method('getUser')->willReturn($user);
+
+        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($request, $token));
     }
 
     public function testDoesNothingIfTheCurrentSectionIsNotShopOnImplicitLogin(): void
     {
-        /** @var UserEvent|MockObject MockObject $userEventMock */
-        $userEventMock = $this->createMock(UserEvent::class);
-        /** @var SectionInterface|MockObject MockObject $sectionMock */
-        $sectionMock = $this->createMock(SectionInterface::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($sectionMock);
-        $userEventMock->expects($this->never())->method('getUser');
-        $this->cartContextMock->expects($this->never())->method('getCart');
-        $this->shopCartBlamerListener->onImplicitLogin($userEventMock);
+        /** @var UserEvent&MockObject $userEvent */
+        $userEvent = $this->createMock(UserEvent::class);
+        /** @var SectionInterface&MockObject $section */
+        $section = $this->createMock(SectionInterface::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($section);
+        $userEvent->expects($this->never())->method('getUser');
+        $this->cartContext->expects($this->never())->method('getCart');
+
+        $this->shopCartBlamerListener->onImplicitLogin($userEvent);
     }
 
     public function testDoesNothingIfTheCurrentSectionIsNotShopOnInteractiveLogin(): void
     {
-        /** @var Request|MockObject MockObject $requestMock */
-        $requestMock = $this->createMock(Request::class);
-        /** @var TokenInterface|MockObject MockObject $tokenMock */
-        $tokenMock = $this->createMock(TokenInterface::class);
-        /** @var SectionInterface|MockObject MockObject $sectionMock */
-        $sectionMock = $this->createMock(SectionInterface::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($sectionMock);
-        $tokenMock->expects($this->never())->method('getUser');
-        $this->cartContextMock->expects($this->never())->method('getCart');
-        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($requestMock, $tokenMock));
+        /** @var Request&MockObject $request */
+        $request = $this->createMock(Request::class);
+        /** @var TokenInterface&MockObject $token */
+        $token = $this->createMock(TokenInterface::class);
+        /** @var SectionInterface&MockObject $section */
+        $section = $this->createMock(SectionInterface::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($section);
+        $token->expects($this->never())->method('getUser');
+        $this->cartContext->expects($this->never())->method('getCart');
+
+        $this->shopCartBlamerListener->onInteractiveLogin(new InteractiveLoginEvent($request, $token));
     }
 }

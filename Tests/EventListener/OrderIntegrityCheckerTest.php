@@ -14,10 +14,8 @@ declare(strict_types=1);
 namespace Tests\Sylius\Bundle\ShopBundle\EventListener;
 
 use Doctrine\Persistence\ObjectManager;
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Sylius\Bundle\CoreBundle\Order\Checker\OrderPromotionsIntegrityCheckerInterface;
 use Sylius\Bundle\ShopBundle\EventListener\OrderIntegrityChecker;
 use Sylius\Bundle\ShopBundle\EventListener\OrderIntegrityCheckerInterface;
@@ -29,23 +27,25 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class OrderIntegrityCheckerTest extends TestCase
 {
-    /** @var RouterInterface|MockObject */
-    private MockObject $routerMock;
+    private RouterInterface&MockObject $router;
 
-    /** @var ObjectManager|MockObject */
-    private MockObject $orderManagerMock;
+    private ObjectManager&MockObject $orderManager;
 
-    /** @var OrderPromotionsIntegrityCheckerInterface|MockObject */
-    private MockObject $orderPromotionsIntegrityCheckerMock;
+    private OrderPromotionsIntegrityCheckerInterface&MockObject $orderPromotionsIntegrityChecker;
 
     private OrderIntegrityChecker $orderIntegrityChecker;
 
     protected function setUp(): void
     {
-        $this->routerMock = $this->createMock(RouterInterface::class);
-        $this->orderManagerMock = $this->createMock(ObjectManager::class);
-        $this->orderPromotionsIntegrityCheckerMock = $this->createMock(OrderPromotionsIntegrityCheckerInterface::class);
-        $this->orderIntegrityChecker = new OrderIntegrityChecker($this->routerMock, $this->orderManagerMock, $this->orderPromotionsIntegrityCheckerMock);
+        $this->router = $this->createMock(RouterInterface::class);
+        $this->orderManager = $this->createMock(ObjectManager::class);
+        $this->orderPromotionsIntegrityChecker = $this->createMock(OrderPromotionsIntegrityCheckerInterface::class);
+
+        $this->orderIntegrityChecker = new OrderIntegrityChecker(
+            $this->router,
+            $this->orderManager,
+            $this->orderPromotionsIntegrityChecker,
+        );
     }
 
     public function testImplementsOrderIntegrityCheckerInterface(): void
@@ -55,87 +55,92 @@ final class OrderIntegrityCheckerTest extends TestCase
 
     public function testDoesNothingIfGivenOrderHasValidPromotionApplied(): void
     {
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        /** @var PromotionInterface|MockObject MockObject $promotionMock */
-        $promotionMock = $this->createMock(PromotionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($orderMock);
-        $orderMock->expects($this->exactly(2))->method('getTotal')->willReturnOnConsecutiveCalls(1000, 1000);
-        $this->orderPromotionsIntegrityCheckerMock->expects($this->once())->method('check')->with($orderMock)->willReturn(null);
-        $eventMock->expects($this->never())->method('stop');
-        $eventMock->expects($this->never())->method('setResponse');
-        $this->orderIntegrityChecker->check($eventMock);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn($order);
+        $order->expects($this->exactly(2))->method('getTotal')->willReturnOnConsecutiveCalls(1000, 1000);
+        $this->orderPromotionsIntegrityChecker->expects($this->once())->method('check')->with($order)->willReturn(null);
+        $event->expects($this->never())->method('stop');
+        $event->expects($this->never())->method('setResponse');
+
+        $this->orderIntegrityChecker->check($event);
     }
 
     public function testStopsFutureActionIfGivenOrderHasDifferentPromotionApplied(): void
     {
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        /** @var PromotionInterface|MockObject MockObject $oldPromotionMock */
-        $oldPromotionMock = $this->createMock(PromotionInterface::class);
-        /** @var PromotionInterface|MockObject MockObject $newPromotionMock */
-        $newPromotionMock = $this->createMock(PromotionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($orderMock);
-        $orderMock->expects($this->once())->method('getTotal')->willReturn(1000);
-        $oldPromotionMock->expects($this->once())->method('getName')->willReturn('Christmas');
-        $this->routerMock->expects($this->once())->method('generate')->with('sylius_shop_checkout_complete')->willReturn('checkout.com');
-        $this->orderPromotionsIntegrityCheckerMock->expects($this->once())->method('check')->with($orderMock)->willReturn($oldPromotionMock);
-        $eventMock->expects($this->once())->method('stop')->with('sylius.order.promotion_integrity', GenericEvent::TYPE_ERROR, ['%promotionName%' => 'Christmas']);
-        $eventMock->expects($this->once())->method('setResponse')->with(new RedirectResponse('checkout.com'));
-        $this->orderManagerMock->expects($this->once())->method('persist')->with($orderMock);
-        $this->orderManagerMock->expects($this->once())->method('flush');
-        $this->orderIntegrityChecker->check($eventMock);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+        /** @var PromotionInterface&MockObject $oldPromotion */
+        $oldPromotion = $this->createMock(PromotionInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn($order);
+        $order->expects($this->once())->method('getTotal')->willReturn(1000);
+        $oldPromotion->expects($this->once())->method('getName')->willReturn('Christmas');
+        $this->router->expects($this->once())->method('generate')->with('sylius_shop_checkout_complete')->willReturn('checkout.com');
+        $this->orderPromotionsIntegrityChecker->expects($this->once())->method('check')->with($order)->willReturn($oldPromotion);
+        $event->expects($this->once())->method('stop')->with('sylius.order.promotion_integrity', GenericEvent::TYPE_ERROR, ['%promotionName%' => 'Christmas']);
+        $event->expects($this->once())->method('setResponse')->with(new RedirectResponse('checkout.com'));
+        $this->orderManager->expects($this->once())->method('persist')->with($order);
+        $this->orderManager->expects($this->once())->method('flush');
+
+        $this->orderIntegrityChecker->check($event);
     }
 
     public function testStopsFutureActionIfGivenOrderHasDifferentTotalValue(): void
     {
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        /** @var PromotionInterface|MockObject MockObject $promotionMock */
-        $promotionMock = $this->createMock(PromotionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($orderMock);
-        $orderMock->expects($this->exactly(2))->method('getTotal')->willReturnOnConsecutiveCalls(1000, 1500);
-        $this->routerMock->expects($this->once())->method('generate')->with('sylius_shop_checkout_complete')->willReturn('checkout.com');
-        $this->orderPromotionsIntegrityCheckerMock->expects($this->once())->method('check')->with($orderMock)->willReturn(null);
-        $eventMock->expects($this->once())->method('stop')->with('sylius.order.total_integrity', GenericEvent::TYPE_ERROR);
-        $eventMock->expects($this->once())->method('setResponse')->with(new RedirectResponse('checkout.com'));
-        $this->orderManagerMock->expects($this->once())->method('persist')->with($orderMock);
-        $this->orderManagerMock->expects($this->once())->method('flush');
-        $this->orderIntegrityChecker->check($eventMock);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn($order);
+        $order->expects($this->exactly(2))->method('getTotal')->willReturnOnConsecutiveCalls(1000, 1500);
+        $this->router->expects($this->once())->method('generate')->with('sylius_shop_checkout_complete')->willReturn('checkout.com');
+        $this->orderPromotionsIntegrityChecker->expects($this->once())->method('check')->with($order)->willReturn(null);
+        $event->expects($this->once())->method('stop')->with('sylius.order.total_integrity', GenericEvent::TYPE_ERROR);
+        $event->expects($this->once())->method('setResponse')->with(new RedirectResponse('checkout.com'));
+        $this->orderManager->expects($this->once())->method('persist')->with($order);
+        $this->orderManager->expects($this->once())->method('flush');
+
+        $this->orderIntegrityChecker->check($event);
     }
 
     public function testStopsFutureActionIfGivenOrderHasNoPromotionApplied(): void
     {
-        /** @var OrderInterface|MockObject MockObject $orderMock */
-        $orderMock = $this->createMock(OrderInterface::class);
-        /** @var PromotionInterface|MockObject MockObject $promotionMock */
-        $promotionMock = $this->createMock(PromotionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($orderMock);
-        $orderMock->expects($this->once())->method('getTotal')->willReturn(1000);
-        $promotionMock->expects($this->once())->method('getName')->willReturn('Christmas');
-        $this->orderPromotionsIntegrityCheckerMock->expects($this->once())->method('check')->with($orderMock)->willReturn($promotionMock);
-        $this->routerMock->expects($this->once())->method('generate')->with('sylius_shop_checkout_complete')->willReturn('checkout.com');
-        $eventMock->expects($this->once())->method('stop')->with('sylius.order.promotion_integrity', GenericEvent::TYPE_ERROR, ['%promotionName%' => 'Christmas']);
-        $eventMock->expects($this->once())->method('setResponse')->with(new RedirectResponse('checkout.com'));
-        $this->orderManagerMock->expects($this->once())->method('persist')->with($orderMock);
-        $this->orderManagerMock->expects($this->once())->method('flush');
-        $this->orderIntegrityChecker->check($eventMock);
+        /** @var OrderInterface&MockObject $order */
+        $order = $this->createMock(OrderInterface::class);
+        /** @var PromotionInterface&MockObject $promotion */
+        $promotion = $this->createMock(PromotionInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn($order);
+        $order->expects($this->once())->method('getTotal')->willReturn(1000);
+        $promotion->expects($this->once())->method('getName')->willReturn('Christmas');
+        $this->orderPromotionsIntegrityChecker->expects($this->once())->method('check')->with($order)->willReturn($promotion);
+        $this->router->expects($this->once())->method('generate')->with('sylius_shop_checkout_complete')->willReturn('checkout.com');
+        $event->expects($this->once())->method('stop')->with('sylius.order.promotion_integrity', GenericEvent::TYPE_ERROR, ['%promotionName%' => 'Christmas']);
+        $event->expects($this->once())->method('setResponse')->with(new RedirectResponse('checkout.com'));
+        $this->orderManager->expects($this->once())->method('persist')->with($order);
+        $this->orderManager->expects($this->once())->method('flush');
+
+        $this->orderIntegrityChecker->check($event);
     }
 
     public function testThrowsInvalidArgumentExceptionIfEventSubjectIsNotOrder(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn(new stdClass());
-        $this->expectException(InvalidArgumentException::class);
-        $this->orderIntegrityChecker->check($eventMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $event->expects($this->once())->method('getSubject')->willReturn(new \stdClass());
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->orderIntegrityChecker->check($event);
     }
 }

@@ -35,21 +35,25 @@ final class OrderItemOriginalPriceToDisplayExtensionTest extends TestCase
 
     public function testReturnsAnOriginalUnitPriceIfItIsGreaterThanOtherPrices(): void
     {
-        /** @var OrderItem|MockObject MockObject $itemMock */
-        $itemMock = $this->createMock(OrderItem::class);
-        $itemMock->expects($this->once())->method('getUnitPrice')->willReturn(1000);
-        $itemMock->expects($this->once())->method('getDiscountedUnitPrice')->willReturn(800);
-        $itemMock->expects($this->once())->method('getOriginalUnitPrice')->willReturn(5000);
-        $this->assertSame(5000, $this->orderItemOriginalPriceToDisplayExtension->getOriginalPriceToDisplay($itemMock));
+        /** @var OrderItem&MockObject $item */
+        $item = $this->createMock(OrderItem::class);
+
+        $item->expects($this->once())->method('getUnitPrice')->willReturn(1000);
+        $item->expects($this->once())->method('getDiscountedUnitPrice')->willReturn(800);
+        $item->expects($this->once())->method('getOriginalUnitPrice')->willReturn(5000);
+
+        $this->assertSame(5000, $this->orderItemOriginalPriceToDisplayExtension->getOriginalPriceToDisplay($item));
     }
 
     public function testReturnsAnUnitPriceIfItIsGreaterThanOriginalUnitPriceAndDiscountedUnitPrice(): void
     {
-        /** @var OrderItem|MockObject MockObject $itemMock */
-        $itemMock = $this->createMock(OrderItem::class);
-        $itemMock->expects($this->once())->method('getUnitPrice')->willReturn(1000);
-        $itemMock->expects($this->once())->method('getDiscountedUnitPrice')->willReturn(800);
-        $itemMock->expects($this->once())->method('getOriginalUnitPrice')->willReturn(null);
-        $this->assertSame(1000, $this->orderItemOriginalPriceToDisplayExtension->getOriginalPriceToDisplay($itemMock));
+        /** @var OrderItem&MockObject $item */
+        $item = $this->createMock(OrderItem::class);
+
+        $item->expects($this->once())->method('getUnitPrice')->willReturn(1000);
+        $item->expects($this->once())->method('getDiscountedUnitPrice')->willReturn(800);
+        $item->expects($this->once())->method('getOriginalUnitPrice')->willReturn(null);
+
+        $this->assertSame(1000, $this->orderItemOriginalPriceToDisplayExtension->getOriginalPriceToDisplay($item));
     }
 }

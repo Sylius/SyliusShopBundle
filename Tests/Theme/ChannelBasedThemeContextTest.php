@@ -25,22 +25,20 @@ use Sylius\Component\Core\Model\ChannelInterface;
 
 final class ChannelBasedThemeContextTest extends TestCase
 {
-    /** @var ChannelContextInterface|MockObject */
-    private MockObject $channelContextMock;
+    private ChannelContextInterface&MockObject $channelContext;
 
-    /** @var ThemeRepositoryInterface|MockObject */
-    private MockObject $themeRepositoryMock;
+    private ThemeRepositoryInterface&MockObject $themeRepository;
 
     private ChannelBasedThemeContext $channelBasedThemeContext;
 
     protected function setUp(): void
     {
-        $this->channelContextMock = $this->createMock(ChannelContextInterface::class);
-        $this->themeRepositoryMock = $this->createMock(ThemeRepositoryInterface::class);
+        $this->channelContext = $this->createMock(ChannelContextInterface::class);
+        $this->themeRepository = $this->createMock(ThemeRepositoryInterface::class);
 
         $this->channelBasedThemeContext = new ChannelBasedThemeContext(
-            $this->channelContextMock,
-            $this->themeRepositoryMock,
+            $this->channelContext,
+            $this->themeRepository,
         );
     }
 
@@ -51,43 +49,44 @@ final class ChannelBasedThemeContextTest extends TestCase
 
     public function testReturnsATheme(): void
     {
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        /** @var ThemeInterface|MockObject MockObject $themeMock */
-        $themeMock = $this->createMock(ThemeInterface::class);
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $channelMock->expects($this->once())->method('getThemeName')->willReturn('theme/name');
-        $this->themeRepositoryMock->expects($this->once())->method('findOneByName')->with('theme/name')->willReturn($themeMock);
-        $this->assertSame($themeMock, $this->channelBasedThemeContext->getTheme());
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+        /** @var ThemeInterface&MockObject $theme */
+        $theme = $this->createMock(ThemeInterface::class);
+
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $channel->expects($this->once())->method('getThemeName')->willReturn('theme/name');
+        $this->themeRepository->expects($this->once())->method('findOneByName')->with('theme/name')->willReturn($theme);
+
+        $this->assertSame($theme, $this->channelBasedThemeContext->getTheme());
     }
 
     public function testReturnsNullIfChannelHasNoTheme(): void
     {
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $channelMock->expects($this->once())->method('getThemeName')->willReturn(null);
-        $this->themeRepositoryMock->expects($this->never())->method('findOneByName');
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $channel->expects($this->once())->method('getThemeName')->willReturn(null);
+        $this->themeRepository->expects($this->never())->method('findOneByName');
+
         $this->assertNull($this->channelBasedThemeContext->getTheme());
     }
 
     public function testReturnsPreviouslyFoundTheme(): void
     {
-        /** @var ThemeInterface|MockObject $themeMock */
-        $themeMock = $this->createMock(ThemeInterface::class);
+        /** @var ThemeInterface|MockObject $theme */
+        $theme = $this->createMock(ThemeInterface::class);
 
-        // Ustawiamy prywatną właściwość "theme" bezpośrednio na obiekcie testowanym
         $reflection = new \ReflectionObject($this->channelBasedThemeContext);
         $property = $reflection->getProperty('theme');
         $property->setAccessible(true);
-        $property->setValue($this->channelBasedThemeContext, $themeMock);
+        $property->setValue($this->channelBasedThemeContext, $theme);
 
-        // Oczekujemy, że nie zostaną wywołane metody, bo theme już jest ustawione
-        $this->channelContextMock->expects($this->never())->method('getChannel');
-        $this->themeRepositoryMock->expects($this->never())->method('findOneByName');
+        $this->channelContext->expects($this->never())->method('getChannel');
+        $this->themeRepository->expects($this->never())->method('findOneByName');
 
-        // Sprawdzenie, czy zwrócony temat to ten sam obiekt
-        $this->assertSame($themeMock, $this->channelBasedThemeContext->getTheme());
+        $this->assertSame($theme, $this->channelBasedThemeContext->getTheme());
     }
 
     public function testReturnsNullIfTheThemeWasNotFoundPreviously(): void
@@ -97,21 +96,31 @@ final class ChannelBasedThemeContextTest extends TestCase
         $property->setAccessible(true);
         $property->setValue($this->channelBasedThemeContext, null);
 
-        $this->channelContextMock->expects($this->never())->method('getChannel');
-        $this->themeRepositoryMock->expects($this->never())->method('findOneByName');
+        $this->channelContext->expects($this->never())->method('getChannel');
+        $this->themeRepository->expects($this->never())->method('findOneByName');
 
         $this->assertNull($this->channelBasedThemeContext->getTheme());
     }
 
     public function testReturnsNullIfThereIsNoChannel(): void
     {
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willThrowException(new ChannelNotFoundException());
+        $this->channelContext
+            ->expects($this->once())
+            ->method('getChannel')
+            ->willThrowException(new ChannelNotFoundException())
+        ;
+
         $this->assertNull($this->channelBasedThemeContext->getTheme());
     }
 
     public function testReturnsNullIfAnyExceptionIsThrownDuringGettingTheChannel(): void
     {
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willThrowException(new \Exception());
+        $this->channelContext
+            ->expects($this->once())
+            ->method('getChannel')
+            ->willThrowException(new \Exception())
+        ;
+
         $this->assertNull($this->channelBasedThemeContext->getTheme());
     }
 }

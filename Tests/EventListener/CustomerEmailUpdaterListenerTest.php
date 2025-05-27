@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace Tests\Sylius\Bundle\ShopBundle\EventListener;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Sylius\Bundle\CoreBundle\SectionResolver\SectionInterface;
 use Sylius\Bundle\CoreBundle\SectionResolver\SectionProviderInterface;
 use Sylius\Bundle\ShopBundle\EventListener\CustomerEmailUpdaterListener;
@@ -36,323 +34,366 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 final class CustomerEmailUpdaterListenerTest extends TestCase
 {
-    /** @var GeneratorInterface|MockObject */
-    private MockObject $tokenGeneratorMock;
+    private GeneratorInterface&MockObject $tokenGenerator;
 
-    /** @var ChannelContextInterface|MockObject */
-    private MockObject $channelContextMock;
+    private ChannelContextInterface&MockObject $channelContext;
 
-    /** @var EventDispatcherInterface|MockObject */
-    private MockObject $eventDispatcherMock;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
 
-    /** @var RequestStack|MockObject */
-    private MockObject $requestStackMock;
+    private RequestStack&MockObject $requestStack;
 
-    /** @var SectionProviderInterface|MockObject */
-    private MockObject $sectionResolverMock;
+    private SectionProviderInterface&MockObject $sectionResolver;
 
-    /** @var TokenStorageInterface|MockObject */
-    private MockObject $tokenStorageMock;
+    private TokenStorageInterface&MockObject $tokenStorage;
 
     private CustomerEmailUpdaterListener $customerEmailUpdaterListener;
 
     protected function setUp(): void
     {
-        $this->tokenGeneratorMock = $this->createMock(GeneratorInterface::class);
-        $this->channelContextMock = $this->createMock(ChannelContextInterface::class);
-        $this->eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
-        $this->requestStackMock = $this->createMock(RequestStack::class);
-        $this->sectionResolverMock = $this->createMock(SectionProviderInterface::class);
-        $this->tokenStorageMock = $this->createMock(TokenStorageInterface::class);
-        $this->customerEmailUpdaterListener = new CustomerEmailUpdaterListener($this->tokenGeneratorMock, $this->channelContextMock, $this->eventDispatcherMock, $this->requestStackMock, $this->sectionResolverMock, $this->tokenStorageMock);
+        $this->tokenGenerator = $this->createMock(GeneratorInterface::class);
+        $this->channelContext = $this->createMock(ChannelContextInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->sectionResolver = $this->createMock(SectionProviderInterface::class);
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+
+        $this->customerEmailUpdaterListener = new CustomerEmailUpdaterListener(
+            $this->tokenGenerator,
+            $this->channelContext,
+            $this->eventDispatcher,
+            $this->requestStack,
+            $this->sectionResolver,
+            $this->tokenStorage,
+        );
     }
 
     public function testDoesNothingChangeWasPerformedByAdminDuringEraseVerification(): void
     {
-        /** @var SectionInterface|MockObject MockObject $sectionMock */
-        $sectionMock = $this->createMock(SectionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($sectionMock);
-        $eventMock->expects($this->never())->method('getSubject');
-        $this->customerEmailUpdaterListener->eraseVerification($eventMock);
+        /** @var SectionInterface&MockObject $section */
+        $section = $this->createMock(SectionInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($section);
+        $event->expects($this->never())->method('getSubject');
+
+        $this->customerEmailUpdaterListener->eraseVerification($event);
     }
 
     public function testDoesNothingChangeWasPerformedByAdminDuringSendVerificationEmail(): void
     {
-        /** @var SectionInterface|MockObject MockObject $sectionMock */
-        $sectionMock = $this->createMock(SectionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($sectionMock);
-        $eventMock->expects($this->never())->method('getSubject');
-        $this->customerEmailUpdaterListener->sendVerificationEmail($eventMock);
+        /** @var SectionInterface&MockObject $section */
+        $section = $this->createMock(SectionInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($section);
+        $event->expects($this->never())->method('getSubject');
+
+        $this->customerEmailUpdaterListener->sendVerificationEmail($event);
     }
 
     public function testRemovesUserVerificationAndDisablesUserIfEmailHasBeenChangedAndChannelRequiresVerification(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $customerMock->expects($this->once())->method('getEmail')->willReturn('new@example.com');
-        $userMock->expects($this->once())->method('getUsername')->willReturn('old@example.com');
-        $this->tokenGeneratorMock->expects($this->once())->method('generate')->willReturn('1d7dbc5c3dbebe5c');
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $channelMock->expects($this->once())->method('isAccountVerificationRequired')->willReturn(true);
-        $userMock->expects($this->once())->method('setVerifiedAt')->with(null);
-        $userMock->expects($this->once())->method('setEmailVerificationToken')->with('1d7dbc5c3dbebe5c');
-        $userMock->expects($this->once())->method('setEnabled')->with(false);
-        $this->tokenStorageMock->expects($this->once())->method('setToken')->with(null);
-        $this->customerEmailUpdaterListener->eraseVerification($eventMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $event->expects($this->once())->method('getSubject')->willReturn($customer);
+        $customer->expects($this->once())->method('getUser')->willReturn($user);
+        $customer->expects($this->once())->method('getEmail')->willReturn('new@example.com');
+
+        $this->tokenGenerator->expects($this->once())->method('generate')->willReturn('1d7dbc5c3dbebe5c');
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $channel->expects($this->once())->method('isAccountVerificationRequired')->willReturn(true);
+
+        $user->expects($this->once())->method('getUsername')->willReturn('old@example.com');
+        $user->expects($this->once())->method('setVerifiedAt')->with(null);
+        $user->expects($this->once())->method('setEmailVerificationToken')->with('1d7dbc5c3dbebe5c');
+        $user->expects($this->once())->method('setEnabled')->with(false);
+
+        $this->tokenStorage->expects($this->once())->method('setToken')->with(null);
+
+        $this->customerEmailUpdaterListener->eraseVerification($event);
     }
 
     public function testRemovesUserVerificationOnlyIfEmailHasBeenChangedButChannelDoesNotRequireVerification(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $customerMock->expects($this->once())->method('getEmail')->willReturn('new@example.com');
-        $userMock->expects($this->once())->method('getUsername')->willReturn('old@example.com');
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $channelMock->expects($this->once())->method('isAccountVerificationRequired')->willReturn(false);
-        $userMock->expects($this->once())->method('setVerifiedAt')->with(null);
-        $this->tokenGeneratorMock->expects($this->never())->method('generate');
-        $userMock->expects($this->never())->method('setEmailVerificationToken');
-        $userMock->expects($this->never())->method('setEnabled')->with(false);
-        $this->tokenStorageMock->expects($this->never())->method('setToken')->with(null);
-        $this->customerEmailUpdaterListener->eraseVerification($eventMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $event->expects($this->once())->method('getSubject')->willReturn($customer);
+        $customer->expects($this->once())->method('getUser')->willReturn($user);
+        $customer->expects($this->once())->method('getEmail')->willReturn('new@example.com');
+
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $channel->expects($this->once())->method('isAccountVerificationRequired')->willReturn(false);
+
+        $user->expects($this->once())->method('getUsername')->willReturn('old@example.com');
+        $user->expects($this->once())->method('setVerifiedAt')->with(null);
+        $user->expects($this->never())->method('setEmailVerificationToken');
+        $user->expects($this->never())->method('setEnabled')->with(false);
+
+        $this->tokenGenerator->expects($this->never())->method('generate');
+        $this->tokenStorage->expects($this->never())->method('setToken')->with(null);
+
+        $this->customerEmailUpdaterListener->eraseVerification($event);
     }
 
     public function testDoesNothingIfEmailHasNotBeenChanged(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $customerMock->expects($this->once())->method('getEmail')->willReturn('new@example.com');
-        $userMock->expects($this->once())->method('getUsername')->willReturn('new@example.com');
-        $this->channelContextMock->expects($this->never())->method('getChannel');
-        $this->tokenGeneratorMock->expects($this->never())->method('generate');
-        $userMock->expects($this->never())->method('setVerifiedAt')->with(null);
-        $userMock->expects($this->never())->method('setEmailVerificationToken');
-        $userMock->expects($this->never())->method('setEnabled')->with(false);
-        $this->tokenStorageMock->expects($this->never())->method('setToken')->with(null);
-        $this->customerEmailUpdaterListener->eraseVerification($eventMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $event->expects($this->once())->method('getSubject')->willReturn($customer);
+        $customer->expects($this->once())->method('getUser')->willReturn($user);
+        $customer->expects($this->once())->method('getEmail')->willReturn('new@example.com');
+
+        $this->channelContext->expects($this->never())->method('getChannel');
+
+        $user->expects($this->once())->method('getUsername')->willReturn('new@example.com');
+        $user->expects($this->never())->method('setVerifiedAt')->with(null);
+        $user->expects($this->never())->method('setEmailVerificationToken');
+        $user->expects($this->never())->method('setEnabled')->with(false);
+
+        $this->tokenGenerator->expects($this->never())->method('generate');
+        $this->tokenStorage->expects($this->never())->method('setToken')->with(null);
+
+        $this->customerEmailUpdaterListener->eraseVerification($event);
     }
 
     public function testThrowsAnInvalidArgumentExceptionIfEventSubjectIsNotCustomerType(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var stdClass|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(stdClass::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($customerMock);
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectException(InvalidArgumentException::class);
-        $this->customerEmailUpdaterListener->sendVerificationEmail($eventMock);
-        $this->expectException(InvalidArgumentException::class);
-        $this->customerEmailUpdaterListener->sendVerificationEmail($eventMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $event->expects($this->once())->method('getSubject')->willReturn(new \stdClass());
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->customerEmailUpdaterListener->sendVerificationEmail($event);
     }
 
     public function testThrowsAnInvalidArgumentExceptionIfUserIsNull(): void
     {
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getUser')->willReturn(null);
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectException(InvalidArgumentException::class);
-        $this->customerEmailUpdaterListener->sendVerificationEmail($eventMock);
-        $this->expectException(InvalidArgumentException::class);
-        $this->customerEmailUpdaterListener->sendVerificationEmail($eventMock);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $event->expects($this->once())->method('getSubject')->willReturn($customer);
+        $customer->expects($this->once())->method('getUser')->willReturn(null);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->customerEmailUpdaterListener->sendVerificationEmail($event);
     }
 
     public function testSendsVerificationEmailAndAddsFlashIfUserVerificationIsRequired(): void
     {
-        /** @var SessionInterface|MockObject MockObject $sessionMock */
-        $sessionMock = $this->createMock(SessionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var FlashBagInterface|MockObject MockObject $flashBagMock */
-        $flashBagMock = $this->createMock(FlashBagInterface::class);
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $channelMock->expects($this->once())->method('isAccountVerificationRequired')->willReturn(true);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $userMock->expects($this->once())->method('isEnabled')->willReturn(false);
-        $userMock->expects($this->once())->method('isVerified')->willReturn(false);
-        $userMock->expects($this->once())->method('getEmailVerificationToken')->willReturn('1d7dbc5c3dbebe5c');
-        $this->requestStackMock->expects($this->once())->method('getSession')->willReturn($sessionMock);
-        $sessionMock->expects($this->once())->method('getBag')->with('flashes')->willReturn($flashBagMock);
-        $flashBagMock->expects($this->once())->method('add')->with('success', 'sylius.user.verify_email_request');
-        $this->eventDispatcherMock->expects($this->once())->method('dispatch')->with($this->isInstanceOf(GenericEvent::class), UserEvents::REQUEST_VERIFICATION_TOKEN)
+        /** @var SessionInterface&MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var FlashBagInterface&MockObject $flashBag */
+        $flashBag = $this->createMock(FlashBagInterface::class);
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $channel->expects($this->once())->method('isAccountVerificationRequired')->willReturn(true);
+        $event->expects($this->once())->method('getSubject')->willReturn($customer);
+        $customer->expects($this->once())->method('getUser')->willReturn($user);
+        $user->expects($this->once())->method('isEnabled')->willReturn(false);
+        $user->expects($this->once())->method('isVerified')->willReturn(false);
+        $user->expects($this->once())->method('getEmailVerificationToken')->willReturn('1d7dbc5c3dbebe5c');
+        $this->requestStack->expects($this->once())->method('getSession')->willReturn($session);
+        $session->expects($this->once())->method('getBag')->with('flashes')->willReturn($flashBag);
+        $flashBag->expects($this->once())->method('add')->with('success', 'sylius.user.verify_email_request');
+        $this->eventDispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(GenericEvent::class), UserEvents::REQUEST_VERIFICATION_TOKEN)
         ;
-        $this->customerEmailUpdaterListener->sendVerificationEmail($eventMock);
+
+        $this->customerEmailUpdaterListener->sendVerificationEmail($event);
     }
 
     public function testDoesNotSendEmailIfUserIsStillEnabled(): void
     {
-        /** @var SessionInterface|MockObject MockObject $sessionMock */
-        $sessionMock = $this->createMock(SessionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var FlashBagInterface|MockObject MockObject $flashBagMock */
-        $flashBagMock = $this->createMock(FlashBagInterface::class);
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $channelMock->expects($this->once())->method('isAccountVerificationRequired')->willReturn(true);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $userMock->expects($this->once())->method('isEnabled')->willReturn(true);
-        $userMock->expects($this->never())->method('isVerified');
-        $userMock->expects($this->never())->method('getEmailVerificationToken');
-        $sessionMock->expects($this->never())->method('getBag')->with('flashes');
-        $flashBagMock->expects($this->never())->method('add');
-        $this->eventDispatcherMock->expects($this->never())->method('dispatch')->with($this->isInstanceOf(GenericEvent::class), UserEvents::REQUEST_VERIFICATION_TOKEN)
+        /** @var SessionInterface&MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var FlashBagInterface&MockObject $flashBag */
+        $flashBag = $this->createMock(FlashBagInterface::class);
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $channel->expects($this->once())->method('isAccountVerificationRequired')->willReturn(true);
+        $event->expects($this->once())->method('getSubject')->willReturn($customer);
+        $customer->expects($this->once())->method('getUser')->willReturn($user);
+        $user->expects($this->once())->method('isEnabled')->willReturn(true);
+        $user->expects($this->never())->method('isVerified');
+        $user->expects($this->never())->method('getEmailVerificationToken');
+        $session->expects($this->never())->method('getBag')->with('flashes');
+        $flashBag->expects($this->never())->method('add');
+        $this->eventDispatcher
+            ->expects($this->never())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(GenericEvent::class), UserEvents::REQUEST_VERIFICATION_TOKEN)
         ;
-        $this->customerEmailUpdaterListener->sendVerificationEmail($eventMock);
+
+        $this->customerEmailUpdaterListener->sendVerificationEmail($event);
     }
 
     public function testDoesNotSendEmailIfUserIsStillVerified(): void
     {
-        /** @var SessionInterface|MockObject MockObject $sessionMock */
-        $sessionMock = $this->createMock(SessionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var FlashBagInterface|MockObject MockObject $flashBagMock */
-        $flashBagMock = $this->createMock(FlashBagInterface::class);
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
+        /** @var SessionInterface&MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var FlashBagInterface&MockObject $flashBag */
+        $flashBag = $this->createMock(FlashBagInterface::class);
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
 
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $channelMock->expects($this->once())->method('isAccountVerificationRequired')->willReturn(true);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $userMock->expects($this->once())->method('isEnabled')->willReturn(false);
-        $userMock->expects($this->once())->method('isVerified')->willReturn(true);
-        $userMock->expects($this->never())->method('getEmailVerificationToken');
-        $sessionMock->expects($this->never())->method('getBag')->with('flashes');
-        $flashBagMock->expects($this->never())->method('add');
-        $this->eventDispatcherMock->expects($this->never())->method('dispatch')->with($this->isInstanceOf(GenericEvent::class), UserEvents::REQUEST_VERIFICATION_TOKEN)
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $channel->expects($this->once())->method('isAccountVerificationRequired')->willReturn(true);
+        $event->expects($this->once())->method('getSubject')->willReturn($customer);
+        $customer->expects($this->once())->method('getUser')->willReturn($user);
+        $user->expects($this->once())->method('isEnabled')->willReturn(false);
+        $user->expects($this->once())->method('isVerified')->willReturn(true);
+        $user->expects($this->never())->method('getEmailVerificationToken');
+        $session->expects($this->never())->method('getBag')->with('flashes');
+        $flashBag->expects($this->never())->method('add');
+        $this->eventDispatcher
+            ->expects($this->never())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(GenericEvent::class), UserEvents::REQUEST_VERIFICATION_TOKEN)
         ;
-        $this->customerEmailUpdaterListener->sendVerificationEmail($eventMock);
+
+        $this->customerEmailUpdaterListener->sendVerificationEmail($event);
     }
 
     public function testDoesNotSendEmailIfUserDoesNotHaveVerificationToken(): void
     {
-        /** @var SessionInterface|MockObject MockObject $sessionMock */
-        $sessionMock = $this->createMock(SessionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var FlashBagInterface|MockObject MockObject $flashBagMock */
-        $flashBagMock = $this->createMock(FlashBagInterface::class);
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $channelMock->expects($this->once())->method('isAccountVerificationRequired')->willReturn(true);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $userMock->expects($this->once())->method('isEnabled')->willReturn(false);
-        $userMock->expects($this->once())->method('isVerified')->willReturn(false);
-        $userMock->expects($this->once())->method('getEmailVerificationToken')->willReturn(null);
-        $sessionMock->expects($this->never())->method('getBag')->with('flashes');
-        $flashBagMock->expects($this->never())->method('add');
-        $this->eventDispatcherMock->expects($this->never())->method('dispatch')->with($this->isInstanceOf(GenericEvent::class), UserEvents::REQUEST_VERIFICATION_TOKEN)
+        /** @var SessionInterface&MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var FlashBagInterface&MockObject $flashBag */
+        $flashBag = $this->createMock(FlashBagInterface::class);
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $channel->expects($this->once())->method('isAccountVerificationRequired')->willReturn(true);
+        $event->expects($this->once())->method('getSubject')->willReturn($customer);
+        $customer->expects($this->once())->method('getUser')->willReturn($user);
+        $user->expects($this->once())->method('isEnabled')->willReturn(false);
+        $user->expects($this->once())->method('isVerified')->willReturn(false);
+        $user->expects($this->once())->method('getEmailVerificationToken')->willReturn(null);
+        $session->expects($this->never())->method('getBag')->with('flashes');
+        $flashBag->expects($this->never())->method('add');
+        $this->eventDispatcher
+            ->expects($this->never())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(GenericEvent::class), UserEvents::REQUEST_VERIFICATION_TOKEN)
         ;
-        $this->customerEmailUpdaterListener->sendVerificationEmail($eventMock);
+
+        $this->customerEmailUpdaterListener->sendVerificationEmail($event);
     }
 
     public function testDoesNothingIfChannelDoesNotRequireVerification(): void
     {
-        /** @var SessionInterface|MockObject MockObject $sessionMock */
-        $sessionMock = $this->createMock(SessionInterface::class);
-        /** @var GenericEvent|MockObject MockObject $eventMock */
-        $eventMock = $this->createMock(GenericEvent::class);
-        /** @var CustomerInterface|MockObject MockObject $customerMock */
-        $customerMock = $this->createMock(CustomerInterface::class);
-        /** @var ShopUserInterface|MockObject MockObject $userMock */
-        $userMock = $this->createMock(ShopUserInterface::class);
-        /** @var FlashBagInterface|MockObject MockObject $flashBagMock */
-        $flashBagMock = $this->createMock(FlashBagInterface::class);
-        /** @var ChannelInterface|MockObject MockObject $channelMock */
-        $channelMock = $this->createMock(ChannelInterface::class);
-        /** @var ShopSection|MockObject MockObject $shopSectionMock */
-        $shopSectionMock = $this->createMock(ShopSection::class);
-        $this->sectionResolverMock->expects($this->once())->method('getSection')->willReturn($shopSectionMock);
-        $this->channelContextMock->expects($this->once())->method('getChannel')->willReturn($channelMock);
-        $channelMock->expects($this->once())->method('isAccountVerificationRequired')->willReturn(false);
-        $eventMock->expects($this->once())->method('getSubject')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getUser')->willReturn($userMock);
-        $sessionMock->expects($this->never())->method('getBag')->with('flashes');
-        $flashBagMock->expects($this->never())->method('add');
-        $this->eventDispatcherMock->expects($this->never())->method('dispatch')->with($this->isInstanceOf(GenericEvent::class), UserEvents::REQUEST_VERIFICATION_TOKEN)
+        /** @var SessionInterface&MockObject $session */
+        $session = $this->createMock(SessionInterface::class);
+        /** @var GenericEvent&MockObject $event */
+        $event = $this->createMock(GenericEvent::class);
+        /** @var CustomerInterface&MockObject $customer */
+        $customer = $this->createMock(CustomerInterface::class);
+        /** @var ShopUserInterface&MockObject $user */
+        $user = $this->createMock(ShopUserInterface::class);
+        /** @var FlashBagInterface&MockObject $flashBag */
+        $flashBag = $this->createMock(FlashBagInterface::class);
+        /** @var ChannelInterface&MockObject $channel */
+        $channel = $this->createMock(ChannelInterface::class);
+        /** @var ShopSection&MockObject $shopSection */
+        $shopSection = $this->createMock(ShopSection::class);
+
+        $this->sectionResolver->expects($this->once())->method('getSection')->willReturn($shopSection);
+        $this->channelContext->expects($this->once())->method('getChannel')->willReturn($channel);
+        $channel->expects($this->once())->method('isAccountVerificationRequired')->willReturn(false);
+        $event->expects($this->once())->method('getSubject')->willReturn($customer);
+        $customer->expects($this->once())->method('getUser')->willReturn($user);
+        $session->expects($this->never())->method('getBag')->with('flashes');
+        $flashBag->expects($this->never())->method('add');
+        $this->eventDispatcher
+            ->expects($this->never())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(GenericEvent::class), UserEvents::REQUEST_VERIFICATION_TOKEN)
         ;
-        $this->customerEmailUpdaterListener->sendVerificationEmail($eventMock);
+
+        $this->customerEmailUpdaterListener->sendVerificationEmail($event);
     }
 }
