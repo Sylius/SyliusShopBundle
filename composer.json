@@ -68,7 +68,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Sylius\\Bundle\\ShopBundle\\": "Tests/"
+            "Tests\\Sylius\\Bundle\\ShopBundle\\": "tests/"
         }
     },
     "repositories": [
