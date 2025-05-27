@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\GenericEvent;
 
 final class CartItemAddListenerTest extends TestCase
 {
-    private OrderModifierInterface&MockObject $orderModifier;
+    private MockObject&OrderModifierInterface $orderModifier;
 
     private CartItemAddListener $cartItemAddListener;
 

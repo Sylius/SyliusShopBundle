@@ -40,11 +40,11 @@ final class CustomerEmailUpdaterListenerTest extends TestCase
 
     private EventDispatcherInterface&MockObject $eventDispatcher;
 
-    private RequestStack&MockObject $requestStack;
+    private MockObject&RequestStack $requestStack;
 
-    private SectionProviderInterface&MockObject $sectionResolver;
+    private MockObject&SectionProviderInterface $sectionResolver;
 
-    private TokenStorageInterface&MockObject $tokenStorage;
+    private MockObject&TokenStorageInterface $tokenStorage;
 
     private CustomerEmailUpdaterListener $customerEmailUpdaterListener;
 

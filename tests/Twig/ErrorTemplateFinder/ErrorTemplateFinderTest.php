@@ -25,7 +25,7 @@ use Twig\Loader\LoaderInterface;
 
 final class ErrorTemplateFinderTest extends TestCase
 {
-    private SectionProviderInterface&MockObject $sectionProvider;
+    private MockObject&SectionProviderInterface $sectionProvider;
 
     private Environment&MockObject $twig;
 

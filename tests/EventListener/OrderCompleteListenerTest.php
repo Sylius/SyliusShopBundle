@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\GenericEvent;
 
 final class OrderCompleteListenerTest extends TestCase
 {
-    private OrderEmailManagerInterface&MockObject $orderEmailManager;
+    private MockObject&OrderEmailManagerInterface $orderEmailManager;
 
     private OrderCompleteListener $orderCompleteListener;
 

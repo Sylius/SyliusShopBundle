@@ -26,7 +26,7 @@ final class OrderCustomerIpListenerTest extends TestCase
 {
     private IpAssignerInterface&MockObject $ipAssigner;
 
-    private RequestStack&MockObject $requestStack;
+    private MockObject&RequestStack $requestStack;
 
     private OrderCustomerIpListener $orderCustomerIpListener;
 

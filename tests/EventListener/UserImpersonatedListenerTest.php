@@ -32,7 +32,7 @@ final class UserImpersonatedListenerTest extends TestCase
 
     private ChannelContextInterface&MockObject $channelContext;
 
-    private OrderRepositoryInterface&MockObject $orderRepository;
+    private MockObject&OrderRepositoryInterface $orderRepository;
 
     private UserImpersonatedListener $userImpersonatedListener;
 

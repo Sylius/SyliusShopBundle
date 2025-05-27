@@ -27,7 +27,7 @@ final class ChannelBasedThemeContextTest extends TestCase
 {
     private ChannelContextInterface&MockObject $channelContext;
 
-    private ThemeRepositoryInterface&MockObject $themeRepository;
+    private MockObject&ThemeRepositoryInterface $themeRepository;
 
     private ChannelBasedThemeContext $channelBasedThemeContext;
 

@@ -34,7 +34,7 @@ final class ShopCartBlamerListenerTest extends TestCase
 {
     private CartContextInterface&MockObject $cartContext;
 
-    private SectionProviderInterface&MockObject $sectionResolver;
+    private MockObject&SectionProviderInterface $sectionResolver;
 
     private ShopCartBlamerListener $shopCartBlamerListener;
 

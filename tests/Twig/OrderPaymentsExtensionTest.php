@@ -24,7 +24,7 @@ use Twig\Extension\AbstractExtension;
 
 final class OrderPaymentsExtensionTest extends TestCase
 {
-    private PaymentMethodsResolverInterface&MockObject $paymentMethodsResolver;
+    private MockObject&PaymentMethodsResolverInterface $paymentMethodsResolver;
 
     private OrderPaymentsExtension $orderPaymentsExtension;
 

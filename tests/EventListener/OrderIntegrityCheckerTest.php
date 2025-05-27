@@ -27,11 +27,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class OrderIntegrityCheckerTest extends TestCase
 {
-    private RouterInterface&MockObject $router;
+    private MockObject&RouterInterface $router;
 
-    private ObjectManager&MockObject $orderManager;
+    private MockObject&ObjectManager $orderManager;
 
-    private OrderPromotionsIntegrityCheckerInterface&MockObject $orderPromotionsIntegrityChecker;
+    private MockObject&OrderPromotionsIntegrityCheckerInterface $orderPromotionsIntegrityChecker;
 
     private OrderIntegrityChecker $orderIntegrityChecker;
 

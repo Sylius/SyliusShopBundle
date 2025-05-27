@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class LocaleStrippingRouterTest extends TestCase
 {
-    private RouterInterface&MockObject $decoratedRouter;
+    private MockObject&RouterInterface $decoratedRouter;
 
     private LocaleContextInterface&MockObject $localeContext;
 

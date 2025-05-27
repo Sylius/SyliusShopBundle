@@ -29,7 +29,7 @@ use Symfony\Component\EventDispatcher\GenericEvent;
 
 final class UserRegistrationListenerTest extends TestCase
 {
-    private ObjectManager&MockObject $userManager;
+    private MockObject&ObjectManager $userManager;
 
     private GeneratorInterface&MockObject $tokenGenerator;
 
@@ -37,7 +37,7 @@ final class UserRegistrationListenerTest extends TestCase
 
     private ChannelContextInterface&MockObject $channelContext;
 
-    private Security&MockObject $security;
+    private MockObject&Security $security;
 
     private UserRegistrationListener $userRegistrationListener;
 

@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\GenericEvent;
 
 final class CartItemRemoveListenerTest extends TestCase
 {
-    private OrderModifierInterface&MockObject $orderModifier;
+    private MockObject&OrderModifierInterface $orderModifier;
 
     private CartItemRemoveListener $cartItemRemoveListener;
 

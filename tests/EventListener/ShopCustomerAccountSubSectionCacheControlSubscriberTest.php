@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 final class ShopCustomerAccountSubSectionCacheControlSubscriberTest extends TestCase
 {
-    private SectionProviderInterface&MockObject $sectionProvider;
+    private MockObject&SectionProviderInterface $sectionProvider;
 
     private ShopCustomerAccountSubSectionCacheControlSubscriber $shopCustomerAccountSubSectionCacheControlSubscriber;
 

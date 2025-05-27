@@ -31,9 +31,9 @@ final class UserCartRecalculationListenerTest extends TestCase
 {
     private CartContextInterface&MockObject $cartContext;
 
-    private OrderProcessorInterface&MockObject $orderProcessor;
+    private MockObject&OrderProcessorInterface $orderProcessor;
 
-    private SectionProviderInterface&MockObject $uriBasedSectionContext;
+    private MockObject&SectionProviderInterface $uriBasedSectionContext;
 
     private UserCartRecalculationListener $userCartRecalculationListener;
 

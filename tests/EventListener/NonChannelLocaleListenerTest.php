@@ -27,7 +27,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class NonChannelLocaleListenerTest extends TestCase
 {
-    private RouterInterface&MockObject $router;
+    private MockObject&RouterInterface $router;
 
     private LocaleProviderInterface&MockObject $localeProvider;
 
@@ -69,7 +69,7 @@ final class NonChannelLocaleListenerTest extends TestCase
             $this->router,
             $this->localeProvider,
             $this->firewallMap,
-            [new \DateTime(), 1, 5.0]
+            [new \DateTime(), 1, 5.0],
         );
     }
 
