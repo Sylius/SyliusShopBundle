@@ -24,7 +24,6 @@
                     </div>
                     {% block sidebar %}
                         <div class="col-12 col-lg-5 py-5 ps-lg-6 position-relative checkout-sidebar">
-                            {{ dump(prefixes) }}
                             {% if active_step|default(null) is not null %}
                                 {% set hooks = [ active_step ~ '.sidebar'] %}
                             {% endif %}
