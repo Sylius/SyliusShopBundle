@@ -69,10 +69,23 @@ final class ShopCustomerAccountSubSectionCacheControlSubscriberTest extends Test
             KernelInterface::MAIN_REQUEST,
             $response,
         );
-        $responseHeaderBag
-            ->expects($this->exactly(4))
+
+        $expectedCalls = [
+            ['no-cache', true],
+            ['max-age', '0'],
+            ['must-revalidate', true],
+            ['no-store', true],
+        ];
+
+        $callIndex = 0;
+        $responseHeaderBag->expects($this->exactly(4))
             ->method('addCacheControlDirective')
-            ->willReturnMap([['no-cache', true], ['max-age', '0'], ['must-revalidate', true], ['no-store', true]])
+            ->willReturnCallback(function ($directive, $value) use (&$callIndex, $expectedCalls) {
+                [$expectedDirective, $expectedValue] = $expectedCalls[$callIndex];
+                $this->assertSame($expectedDirective, $directive);
+                $this->assertSame($expectedValue, $value);
+                ++$callIndex;
+            })
         ;
 
         $this->shopCustomerAccountSubSectionCacheControlSubscriber->setCacheControlDirectives($event);
