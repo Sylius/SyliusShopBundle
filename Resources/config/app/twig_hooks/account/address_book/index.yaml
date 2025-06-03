@@ -23,13 +23,13 @@ sylius_twig_hooks:
         'sylius_shop.account.address_book.index.content.main.header':
             title:
                 template: '@SyliusShop/account/address_book/index/content/main/header/title.html.twig'
-                priority: 200
+                priority: 100
             subtitle:
                 template: '@SyliusShop/account/address_book/index/content/main/header/subtitle.html.twig'
-                priority: 100
+                priority: 0
             buttons:
                 template: '@SyliusShop/account/address_book/index/content/main/header/buttons.html.twig'
-                priority: 0
+                priority: -100
 
         'sylius_shop.account.address_book.index.content.main.buttons':
             add_address:
