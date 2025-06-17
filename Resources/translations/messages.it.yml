@@ -8,7 +8,7 @@ sylius:
     email:
         order_confirmation:
             has_been_successfully_placed: 'è stato effettuato con successo.'
-            subject: 'Conferma dell\'ordine'
+            subject: 'Conferma dell''ordine'
             view_order_or_change_payment_method: 'Visualizza ordine o cambia metodo di pagamento'
             thank_you: 'Grazie per aver acquistato nel nostro negozio!'
             your_order_number: 'Il numero del tuo ordine'
@@ -40,7 +40,7 @@ sylius:
     homepage:
         about_us: 'Chi siamo'
         about_us_content: 'Benvenuto nel nostro negozio, il tuo negozio online numero uno che ti offre i migliori prodotti. Puoi scegliere tra i migliori vestiti e scarpe della nostra offerta. (<i>Puoi modificare questo contenuto sovrascrivendo la chiave "sylius.homepage.about_us_content" nel tuo file di traduzione</i>)'
-        banner_content: 'Preparati! L\'inverno sta arrivando'
+        banner_content: 'Preparati! L''inverno sta arrivando'
         banner_button: 'Scopri la nuova collezione'
         carousel_header: 'Prodotti in evidenza'
         latest_deals: 'Ultime offerte'
