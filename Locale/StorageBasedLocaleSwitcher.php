@@ -25,7 +25,7 @@ final class StorageBasedLocaleSwitcher implements LocaleSwitcherInterface
     public function __construct(
         private LocaleStorageInterface $localeStorage,
         private ChannelContextInterface $channelContext,
-        private ?UrlMatcherInterface $urlMatcher = null
+        private ?UrlMatcherInterface $urlMatcher = null,
     ) {
         if (null === $this->urlMatcher) {
             trigger_deprecation(
@@ -33,7 +33,7 @@ final class StorageBasedLocaleSwitcher implements LocaleSwitcherInterface
                 '2.1',
                 'Not passing a "%s" to "%s" is deprecated and will be required in Sylius 3.0.',
                 UrlMatcherInterface::class,
-                self::class
+                self::class,
             );
         }
     }
