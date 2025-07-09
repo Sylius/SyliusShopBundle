@@ -1,11 +1,11 @@
 {% import "@SyliusShop/shared/macro/money.html.twig" as money %}
 
-{% set variant             = hookable_metadata.context.variant %}
-{% set channel_pricing     = variant.getChannelPricingForChannel(sylius.channel) %}
-{% set applied_promotions  = channel_pricing.appliedPromotions|map(p => {'label': p.label, 'description': p.description}) %}
-{% set days                = sylius.channel.channelPriceHistoryConfig.lowestPriceForDiscountedProductsCheckingPeriod %}
-{% set has_discount        = variant|sylius_has_discount({'channel': sylius.channel}) %}
-{% set has_lowest_price    = variant|sylius_has_lowest_price({'channel': sylius.channel}) %}
+{% set variant = hookable_metadata.context.variant %}
+{% set channel_pricing = variant.getChannelPricingForChannel(sylius.channel) %}
+{% set applied_promotions = channel_pricing.appliedPromotions|map(p => {'label': p.label, 'description': p.description}) %}
+{% set days = sylius.channel.channelPriceHistoryConfig.lowestPriceForDiscountedProductsCheckingPeriod %}
+{% set has_discount = variant|sylius_has_discount({'channel': sylius.channel}) %}
+{% set has_lowest_price = variant|sylius_has_lowest_price({'channel': sylius.channel}) %}
 
 {% if has_discount %}
     {% set original_int = channel_pricing.originalPrice %}
