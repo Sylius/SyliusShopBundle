@@ -83,3 +83,15 @@ $.fn.extend({
     }
   },
 });
+
+const handleClickMainImage = function handleClickMainImage(e) {
+  e.preventDefault();
+
+  const thumbnails = $('[data-lightbox="sylius-product-image"]');
+  if (thumbnails.length > 0) {
+    thumbnails[0].click();
+  }
+};
+
+const mainImage = $('#main-image');
+mainImage.click(handleClickMainImage);
