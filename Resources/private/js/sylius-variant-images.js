@@ -87,11 +87,16 @@ $.fn.extend({
 const handleClickMainImage = function handleClickMainImage(e) {
   e.preventDefault();
 
+  const mainImageSrcExploded = e.target.src.split('/');
+
   const thumbnails = $('[data-lightbox="sylius-product-image"]');
-  if (thumbnails.length > 0) {
-    thumbnails[0].click();
-  }
+  thumbnails.each((index, element) => {
+    const imageSrcExploded = $(element).find('img').attr('src').split('/');
+    if (mainImageSrcExploded[mainImageSrcExploded.length - 1] === imageSrcExploded[imageSrcExploded.length - 1]) {
+      element.click();
+    }
+  });
 };
 
-const mainImage = $('#main-image');
+const mainImage = $('a.ui.fluid.image > img');
 mainImage.click(handleClickMainImage);
