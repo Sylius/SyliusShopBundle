@@ -12,12 +12,30 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    initialize() {
-        const mainImage = document.getElementById('main-image');
-        const thumbnails = mainImage.closest('.spotlight-group').querySelectorAll('.spotlight');
-        mainImage.addEventListener('click', (e) => {
+    connect() {
+        const mainImage = this.element.querySelector('#main-image');
+        if (!mainImage) {
+            return;
+        }
+
+        this._onMainImageClick = (e) => {
+            const thumbnails = this.element.querySelectorAll('.spotlight');
+            if (!thumbnails || thumbnails.length === 0 || typeof Spotlight === 'undefined') {
+                return;
+            }
+
             e.preventDefault();
+
             Spotlight.show(thumbnails, 0);
-        });
+        };
+
+        mainImage.addEventListener('click', this._onMainImageClick);
+    }
+
+    disconnect() {
+        const mainImage = this.element.querySelector('#main-image');
+        if (mainImage && this._onMainImageClick) {
+            mainImage.removeEventListener('click', this._onMainImageClick);
+        }
     }
 }
