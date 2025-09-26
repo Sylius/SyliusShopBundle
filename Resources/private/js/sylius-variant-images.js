@@ -84,7 +84,8 @@ $.fn.extend({
   },
 });
 
-const handleClickMainImage = function handleClickMainImage(e) {
+const mainImage = $('a.ui.fluid.image > img');
+mainImage.click((e) => {
   e.preventDefault();
 
   const mainImageSrcExploded = e.target.src.split('/');
@@ -96,7 +97,4 @@ const handleClickMainImage = function handleClickMainImage(e) {
       element.click();
     }
   });
-};
-
-const mainImage = $('a.ui.fluid.image > img');
-mainImage.click(handleClickMainImage);
+});
