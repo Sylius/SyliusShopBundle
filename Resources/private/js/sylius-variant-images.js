@@ -83,3 +83,18 @@ $.fn.extend({
     }
   },
 });
+
+const mainImage = $('a.ui.fluid.image > img');
+mainImage.click((e) => {
+  e.preventDefault();
+
+  const mainImageSrcExploded = e.target.src.split('/');
+
+  const thumbnails = $('[data-lightbox="sylius-product-image"]');
+  thumbnails.each((index, element) => {
+    const imageSrcExploded = $(element).find('img').attr('src').split('/');
+    if (mainImageSrcExploded[mainImageSrcExploded.length - 1] === imageSrcExploded[imageSrcExploded.length - 1]) {
+      element.click();
+    }
+  });
+});

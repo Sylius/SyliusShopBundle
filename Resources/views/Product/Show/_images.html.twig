@@ -16,7 +16,7 @@
 {% endif %}
 
 <div data-product-image="{{ path }}" data-product-link="{{ original_path }}"></div>
-<a href="{{ original_path }}" class="ui fluid image" data-lightbox="sylius-product-image">
+<a href="{{ original_path }}" class="ui fluid image"{% if product.images|length < 2%} data-lightbox="sylius-product-image"{% endif %}>
     <img src="{{ path }}" id="main-image" alt="{{ product.name }}" {{ sylius_test_html_attribute('main-image') }} />
 </a>
 {% if product.images|length > 1 %}
